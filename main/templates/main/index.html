@@ -1,0 +1,72 @@
+{% load static %}
+{% csrf_token %}
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="{% static 'main/js/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'main/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'main/js/convert.js' %}"></script>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+    <title>Jinja2 Template Parser</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row py-3 text-center"> 
+            <div class="col-md-12">
+                <h3>Jinja2 Template Parser</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <form class="form">
+                    <div class="form-group row col-md-6">
+                        <label for="repoSelect" class="col-sm-4 col-form-label">Repository</label>
+                        <div class="col-sm-8">
+                            <select class="custom-select form-control" id="repoSelect" required>
+                                <option value="">Choose...</option>
+                                <option>repo 1</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row col-md-6">
+                        <label for="templateSelect" class="col-sm-4 col-form-label">Template</label>
+                        <div class="col-sm-8">
+                            <select class="custom-select  form-control" id="templateSelect" required>
+                                <option value="">Choose...</option>
+                                <option>template 1</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>  
+            </div>
+        </div>
+
+        <form id="convertForm" action="." method="post">
+            {% csrf_token %}
+            <div class="form-row mb-3">
+                <div class="form-group col-md-4">
+                    <h4>Variables</h4>
+                    <textarea id="templateVars" name="templateVars" class="form-control" rows="20"></textarea>
+                </div>           
+                <div class="form-group col-md-8">
+                    <h4>Template</h4>
+                    <textarea id="template" name="template" class="form-control" rows="20"></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-success" id="convert">Convert</button>
+                    <button type="submit" class="btn btn-danger" id="clear">Clear</button>
+                    <button type="submit" class="btn btn-warning" id="copy">Copy</button>
+                    <button type="submit" class="btn btn-secondary" id="save">Save</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</body>
+
+</html>
