@@ -5,10 +5,16 @@
 <head>
     <script src="{% static 'main/js/jquery-3.4.1.min.js' %}"></script>
     <script src="{% static 'main/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'main/plugins/codemirror/lib/codemirror.js' %}"></script>
+    <script src="{% static 'main/plugins/codemirror/mode/javascript/javascript.js' %}"></script>
+    <script src="{% static 'main/plugins/codemirror/mode/yaml/yaml.js' %}"></script>
+    <script src="{% static 'main/plugins/codemirror/mode/jinja2/jinja2.js' %}"></script>
     <script src="{% static 'main/js/convert.js' %}"></script>
 
     <link rel="stylesheet" type="text/css" href="{% static 'main/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'main/plugins/codemirror/lib/codemirror.css' %} ">
     <link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+
     <title>Jinja2 Template Parser</title>
 </head>
 
@@ -49,14 +55,14 @@
             <div class="form-row mb-3">
                 <div class="form-group col-md-4">
                     <h4>Variables</h4>
-                    <textarea id="templateVars" name="templateVars" class="form-control" rows="20"></textarea>
+                    <textarea id="templateVars" name="templateVars" class="form-control"></textarea>
                 </div>           
                 <div class="form-group col-md-8">
                     <h4>Template</h4>
                     <textarea id="template" name="template" class="form-control" rows="20"></textarea>
                 </div>
             </div>
-            <div class="row">
+            <div class="row mt-3">
                 <div class="col-md-12">
                     <button type="submit" class="btn btn-success" id="convert">Convert</button>
                     <button type="submit" class="btn btn-danger" id="clear">Clear</button>

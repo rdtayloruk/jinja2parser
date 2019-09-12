@@ -1,4 +1,14 @@
 $(function(){
+    var varEditor = CodeMirror.fromTextArea($('#templateVars').get(0),{
+        mode:  "yaml",
+        lineNumbers: true
+      });
+    
+    var tplEditor = CodeMirror.fromTextArea($('#template').get(0),{
+        mode:  "jinja2",
+        lineNumbers: true
+      });
+    
     $('#clear').click(function() {
         $('#template').val('');
         $('#templateVars').val('');
