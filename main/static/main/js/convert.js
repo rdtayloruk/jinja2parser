@@ -1,4 +1,5 @@
 $(function(){
+
     var varEditor = CodeMirror.fromTextArea($('#templateVars').get(0),{
         mode:  "yaml",
         lineNumbers: true
@@ -8,26 +9,69 @@ $(function(){
         mode:  "jinja2",
         lineNumbers: true
       });
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
     
-    $('#clear').click(function() {
-        $('#template').val('');
-        $('#templateVars').val('');
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
     });
 
-    $("#convertForm").on('submit', function(e) { 
+    $('#clear').on('click', function() {
+        tplEditor.setValue('');
+        varEditor.setValue('')
+    });
+
+    $('#copy').on('click', function() {
         e.preventDefault();
-        console.log("convert template called")
-        console.log($(this).serialize()),
+        tplEditor.focus();
+        tplEditor.select();
+	    document.execCommand('copy')
+        // copy to clipboard
+    });
+
+    $('#save').on('click', function() {
+        e.preventDefault();
+        // save template as file
+    });
+
+    $('#convert').on('click', function(e) { 
+        e.preventDefault();
+        console.log("convert triggered")
         $.ajax({
             url: '/convert',
             type: 'POST', 
-            data: $(this).serialize(),
+            data: { 
+                template: tplEditor.getValue(),
+                templateVars: varEditor.getValue()
+            },
             success: function (data) {
-                $('#template').val(data)
+                tplEditor.setValue(data)
             },
             error: function (xhr,errmsg,err) {
-                console.log(xhr.status + ": " + xhr.responseText);
-                console.log(errmsg);
+                alert(xhr.status + ": " + xhr.responseText);
             }
           });
     });
