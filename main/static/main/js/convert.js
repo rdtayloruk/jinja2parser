@@ -39,12 +39,31 @@ $(function(){
         }
     });
 
-    $('#clear').on('click', function() {
+    $('#repoSelect').on('change', function(e) {
+        e.preventDefault();
+        console.log("get templates")
+        $.ajax({
+            url: '/templateList',
+            type: 'GET', 
+            data: { 
+                repo: $(this).val(),
+            },
+            success: function (data) {
+                console.log(data)
+                $('#templateSelect').val(data.templates[0])
+            },
+            error: function (xhr,errmsg,err) {
+                alert(xhr.status + ": " + xhr.responseText);
+            }
+          });
+    });
+
+    $('#clear').on('click', function(e) {
         tplEditor.setValue('');
         varEditor.setValue('')
     });
 
-    $('#copy').on('click', function() {
+    $('#copy').on('click', function(e) {
         e.preventDefault();
         tplEditor.focus();
         tplEditor.select();
@@ -52,7 +71,7 @@ $(function(){
         // copy to clipboard
     });
 
-    $('#save').on('click', function() {
+    $('#save').on('click', function(e) {
         e.preventDefault();
         // save template as file
     });
