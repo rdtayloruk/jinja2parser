@@ -3,11 +3,13 @@ from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
 from jinja2 import Environment, meta, exceptions
-import yaml
+import yaml, base64
 from main.gitea import GiteaAPI
 
 GITEA_URL = "https://try.gitea.io/api/v1"
 ORG = "rttest"
+TEMPLATE_PATH = "templates"
+VARS_PATH = "vars"
 
 def index(request):
     context = {'repos': get_repos(ORG)}
@@ -44,8 +46,16 @@ def template_list(request):
     return JsonResponse(templates)
 
 def template(request):
-    template = request.GET.get('template')
-    pass
+    repo = request.GET.get('repo')
+    path = TEMPLATE_PATH + "/" + request.GET.get('template')
+    template = get_file(ORG, repo, path)
+    return HttpResponse(template)
+
+def template_vars(request):
+    repo = request.GET.get('repo')
+    path = TEMPLATE_PATH + "/" + request.GET.get('vars')
+    template = get_file(ORG, repo, path)
+    return HttpResponse(template)
 
 
 # Helpers
@@ -58,9 +68,15 @@ def get_repos(org):
 
 def get_templates(org, repo):
     vcs =  GiteaAPI(GITEA_URL)
-    templates = vcs.get_contents_path(org, repo, "templates")
+    templates = vcs.get_contents_path(org, repo, TEMPLATE_PATH)
     print(templates)
     templates = [t['name'] for t in templates if t['name'].endswith('.j2')]
     return templates
 
+def get_file(org, repo, path):
+    vcs =  GiteaAPI(GITEA_URL)
+    file_details = vcs.get_contents_path(org, repo, path)
+    file_base64 = file_details.get('content')
+    file_str = base64.b64decode(template_base64)
+    return file_str
 

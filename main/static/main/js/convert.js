@@ -41,6 +41,7 @@ $(function(){
 
     $('#repoSelect').on('change', function(e) {
         e.preventDefault();
+        $('#templateSelect').val('');
         console.log("get templates")
         $.ajax({
             url: '/templateList',
@@ -50,7 +51,32 @@ $(function(){
             },
             success: function (data) {
                 console.log(data)
-                $('#templateSelect').val(data.templates[0])
+                $.each( data.templates, function( i, val ) {
+                    $('#templateSelect').append($('<option>', {
+                        value: val,
+                        text: val
+                    }));
+                });
+            },
+            error: function (xhr,errmsg,err) {
+                alert(xhr.status + ": " + xhr.responseText);
+            }
+          });
+    });
+    
+    $('#templateSelect').on('change', function(e) {
+        e.preventDefault();
+        console.log("get template")
+        $.ajax({
+            url: '/template',
+            type: 'GET', 
+            data: { 
+                template: $(this).val(),
+                repo: $('#repoSelect').val()
+            },
+            success: function (data) {
+                console.log(data)
+                tplEditor.setValue(data);
             },
             error: function (xhr,errmsg,err) {
                 alert(xhr.status + ": " + xhr.responseText);
