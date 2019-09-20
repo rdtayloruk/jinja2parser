@@ -1,5 +1,7 @@
 $(function(){
 
+    var templateDef 
+
     var varEditor = CodeMirror.fromTextArea($('#templateVars').get(0),{
         mode:  "yaml",
         lineNumbers: true
@@ -41,7 +43,8 @@ $(function(){
 
     $('#repoSelect').on('change', function(e) {
         e.preventDefault();
-        $('#templateSelect').val('');
+        //$('#templateSelect :not(:first-child)').remove();
+        $('#templateSelect').children().remove();
         console.log("get templates")
         $.ajax({
             url: '/templateList',
@@ -51,10 +54,11 @@ $(function(){
             },
             success: function (data) {
                 console.log(data)
-                $.each( data.templates, function( i, val ) {
+                templateDef = data
+                $.each( templateDef.templates, function( i, val ) {
                     $('#templateSelect').append($('<option>', {
-                        value: val,
-                        text: val
+                        value: val.name,
+                        text: val.name
                     }));
                 });
             },
@@ -72,7 +76,8 @@ $(function(){
             type: 'GET', 
             data: { 
                 template: $(this).val(),
-                repo: $('#repoSelect').val()
+                repo: $('#repoSelect').val(),
+                path: templateDef.templates_dir
             },
             success: function (data) {
                 console.log(data)

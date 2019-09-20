@@ -3,13 +3,14 @@ from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
 from jinja2 import Environment, meta, exceptions
-import yaml, base64
+import yaml, json, base64, re
 from main.gitea import GiteaAPI
 
 GITEA_URL = "https://try.gitea.io/api/v1"
 ORG = "rttest"
 TEMPLATE_PATH = "templates"
 VARS_PATH = "vars"
+TEMPLATE_DEF = "j2-templates.json"
 
 def index(request):
     context = {'repos': get_repos(ORG)}
@@ -42,20 +43,21 @@ def convert(request):
 
 def template_list(request):
     repo = request.GET.get('repo')
-    templates = { 'templates': get_templates(ORG, repo) }
-    return JsonResponse(templates)
+    org = ORG
+    path = TEMPLATE_DEF
+    try:
+        templates = json.loads(get_file(org, repo, path).decode('UTF-8'))
+        print(templates)
+        return JsonResponse(templates)
+    except:
+        return JsonResponse({"error": "not able to parse %s" % TEMPLATE_DEF})
 
 def template(request):
     repo = request.GET.get('repo')
-    path = TEMPLATE_PATH + "/" + request.GET.get('template')
+    path = request.GET.get('path') + "/" + request.GET.get('template')
     template = get_file(ORG, repo, path)
     return HttpResponse(template)
 
-def template_vars(request):
-    repo = request.GET.get('repo')
-    path = TEMPLATE_PATH + "/" + request.GET.get('vars')
-    template = get_file(ORG, repo, path)
-    return HttpResponse(template)
 
 
 # Helpers
@@ -77,6 +79,14 @@ def get_file(org, repo, path):
     vcs =  GiteaAPI(GITEA_URL)
     file_details = vcs.get_contents_path(org, repo, path)
     file_base64 = file_details.get('content')
-    file_str = base64.b64decode(template_base64)
+    file_str = base64.b64decode(file_base64)
     return file_str
 
+def get_manifest(org, repo):
+    vcs =  GiteaAPI(GITEA_URL)
+    path = TEMPLATE_DEF
+    f = vcs.get_contents_path(org, repo, path)
+    file_base64 = f.get('content')
+    file_str = base64.b64decode(file_base64).decode('UTF-8')
+    file_json = json.loads(file_str)
+    print(file_json)
