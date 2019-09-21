@@ -5,6 +5,6 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('convert', views.convert, name='convert'),
-    path('templateList', views.template_list, name='template_list'),
-    path('template', views.template, name='template'),
+    path('repos/<owner>/<repo>/templates', views.repo_template_list, name='repo_templates_list'),
+    path('repos/<owner>/<repo>/contents/<path>', views.repo_file, name='repo_file'),
 ]

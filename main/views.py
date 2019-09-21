@@ -12,6 +12,8 @@ TEMPLATE_PATH = "templates"
 VARS_PATH = "vars"
 TEMPLATE_DEF = "j2-templates.json"
 
+vcs =  GiteaAPI(GITEA_URL)
+
 def index(request):
     context = {'repos': get_repos(ORG)}
     return render(request, 'main/index.html', context)
@@ -40,22 +42,17 @@ def convert(request):
 
     return HttpResponse(rendered_jinja2_tpl)
 
-
-def template_list(request):
-    repo = request.GET.get('repo')
-    org = ORG
-    path = TEMPLATE_DEF
+def repo_template_list(request, owner, repo):
     try:
-        templates = json.loads(get_file(org, repo, path).decode('UTF-8'))
+        templates = json.loads(get_file(owner, repo, TEMPLATE_DEF))
         print(templates)
         return JsonResponse(templates)
     except:
         return JsonResponse({"error": "not able to parse %s" % TEMPLATE_DEF})
 
-def template(request):
-    repo = request.GET.get('repo')
-    path = request.GET.get('path') + "/" + request.GET.get('template')
-    template = get_file(ORG, repo, path)
+def repo_file(request, owner, repo, path):
+    path = path + "/" + request.GET.get('name')
+    template = get_file(owner, repo, path)
     return HttpResponse(template)
 
 
@@ -63,30 +60,18 @@ def template(request):
 # Helpers
 
 def get_repos(org):
-    vcs =  GiteaAPI(GITEA_URL)
     repos = vcs.get_repos(org)
-    repos = [r['name'] for r in repos]
+    repos = [r['full_name'] for r in repos]
     return repos
 
-def get_templates(org, repo):
-    vcs =  GiteaAPI(GITEA_URL)
-    templates = vcs.get_contents_path(org, repo, TEMPLATE_PATH)
-    print(templates)
-    templates = [t['name'] for t in templates if t['name'].endswith('.j2')]
-    return templates
+#def get_templates(org, repo):
+#    templates = vcs.get_contents_path(org, repo, TEMPLATE_PATH)
+#    print(templates)
+#    templates = [t['name'] for t in templates if t['name'].endswith('.j2')]
+#    return templates
 
 def get_file(org, repo, path):
-    vcs =  GiteaAPI(GITEA_URL)
     file_details = vcs.get_contents_path(org, repo, path)
     file_base64 = file_details.get('content')
-    file_str = base64.b64decode(file_base64)
-    return file_str
-
-def get_manifest(org, repo):
-    vcs =  GiteaAPI(GITEA_URL)
-    path = TEMPLATE_DEF
-    f = vcs.get_contents_path(org, repo, path)
-    file_base64 = f.get('content')
     file_str = base64.b64decode(file_base64).decode('UTF-8')
-    file_json = json.loads(file_str)
-    print(file_json)
+    return file_str

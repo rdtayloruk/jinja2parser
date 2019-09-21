@@ -1,6 +1,6 @@
 $(function(){
 
-    var templateDef 
+    var repo; 
 
     var varEditor = CodeMirror.fromTextArea($('#templateVars').get(0),{
         mode:  "yaml",
@@ -43,19 +43,18 @@ $(function(){
 
     $('#repoSelect').on('change', function(e) {
         e.preventDefault();
-        //$('#templateSelect :not(:first-child)').remove();
-        $('#templateSelect').children().remove();
+        $('#templateSelect :not(:first-child)').remove();
         console.log("get templates")
         $.ajax({
-            url: '/templateList',
+            url: '/repos/' + $(this).val() + '/templates',
             type: 'GET', 
-            data: { 
+            /*data: { 
                 repo: $(this).val(),
-            },
+            },*/
             success: function (data) {
                 console.log(data)
-                templateDef = data
-                $.each( templateDef.templates, function( i, val ) {
+                repo = data
+                $.each( repo.templates, function( i, val ) {
                     $('#templateSelect').append($('<option>', {
                         value: val.name,
                         text: val.name
@@ -70,14 +69,13 @@ $(function(){
     
     $('#templateSelect').on('change', function(e) {
         e.preventDefault();
-        console.log("get template")
+        $('#varsSelect :not(:first-child)').remove();
+        console.log("get template");
         $.ajax({
-            url: '/template',
+            url: '/repos/' + $('#repoSelect').val() + '/contents' + repo.templates_dir,
             type: 'GET', 
             data: { 
-                template: $(this).val(),
-                repo: $('#repoSelect').val(),
-                path: templateDef.templates_dir
+                name: $(this).val(),
             },
             success: function (data) {
                 console.log(data)
