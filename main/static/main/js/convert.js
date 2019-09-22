@@ -87,12 +87,12 @@ $(function(){
           });
         console.log($(this).prop('selectedIndex'));
         //repo.templates[$(this).prop('selectedIndex'))].template_vars;
-        $.each( , function( i, val ) {
+        /*$.each( , function( i, val ) {
             $('#varsSelect').append($('<option>', {
                 value: val.name,
                 text: val.name
             }));
-        });
+        });*/
     });
 
     $('#clear').on('click', function(e) {
