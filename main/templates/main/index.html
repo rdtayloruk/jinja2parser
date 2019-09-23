@@ -37,15 +37,14 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-2">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">master <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">master</a></li>
-                    </ul>
-                </li>
+            <div class="input-group input-group-sm row col-md-2 mb-2">
+                    <select class="custom-select-sm form-control" id="repoBranchSelect" required>
+                        <option><a href="#">master</a></option>
+                        <option><a href="#">dev1</a></option>
+                    </select>
             </div>
         </div>
+        
         <div class="row">
             <div class="input-group input-group-sm row col-md-6 mb-2">
                 <label for="templateSelect" class="col-sm-4 col-form-label">Template</label>
@@ -57,7 +56,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="input-group input-group-sm row col-md-6 mb-4">
+            <div class="input-group input-group-sm row col-md-6 mb-2">
                 <label for="varsSelect" class="col-sm-4 col-form-label">Variables</label>
                 <div class="col-sm-8">
                     <select class="custom-select-sm form-control" id="varsSelect" required>
@@ -66,6 +65,26 @@
                 </div>
             </div>
         </div>    
+
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <span>Options</span>
+            </div>
+            <div class="col-md-10">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="trimBlocks" checked>
+                    <label class="form-check-label" for="inlineCheckbox1">trim_blocks</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="lstripBlocks" value="lstrip_blocks" checked>
+                    <label class="form-check-label" for="inlineCheckbox2">lstrip_blocks</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="strictUndefined" value="StrictUndefined" checked>
+                    <label class="form-check-label" for="inlineCheckbox3">StrictUndefined</label>
+                </div>
+            </div>
+        </div>
 
 
         <div class="row mb-3">
