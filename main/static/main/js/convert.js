@@ -122,11 +122,9 @@ $(function(){
             data: { 
                 template: tplEditor.getValue(),
                 templateVars: varEditor.getValue(),
-                //options: {
                 trim_blocks: $('#trimBlocks').prop('checked'),
                 lstrip_blocks: $('#lstripBlocks').prop('checked'),
-                StrictUndefined: $('#strictUndefined').prop('checked')
-                //}
+                strict_undefined: $('#strictUndefined').prop('checked')
             },
             success: function (data) {
                 tplEditor.setValue(data)

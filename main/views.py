@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
-from jinja2 import Environment, meta, exceptions
+from jinja2 import Environment, meta, exceptions, Undefined, StrictUndefined
 import yaml, json, base64, re
 from main.gitea import GiteaAPI
 
@@ -20,7 +20,14 @@ def index(request):
 
 @require_POST
 def convert(request):
-    jinja2_env = Environment(trim_blocks=True, lstrip_blocks=True)
+    trim_blocks = request.POST.get('trim_blocks', True)
+    lstrip_blocks = request.POST.get('lstrip_blocks', True)
+    if request.POST.get('strict_undefined'):
+        undefined = StrictUndefined
+    else:
+        undefined = Undefined
+
+    jinja2_env = Environment(trim_blocks=trim_blocks, lstrip_blocks=lstrip_blocks, undefined=undefined)
 
     # Load the template
     try:
