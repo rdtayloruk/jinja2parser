@@ -1,6 +1,10 @@
 $(function(){
 
-    var repo; 
+    var repoName;
+    var templateData;
+    var templateName;
+    var templateVarsName;
+    var templateVarFiles;
 
     var varEditor = CodeMirror.fromTextArea($('#templateVars').get(0),{
         mode:  "yaml",
@@ -46,13 +50,14 @@ $(function(){
         $('#templateSelect :not(:first-child)').remove();
         $('#varsSelect :not(:first-child)').remove();
         console.log("get templates")
+        repoName = $(this).val()
         $.ajax({
-            url: '/repos/' + $(this).val() + '/templates',
+            url: '/repos/' + repoName + '/templates',
             type: 'GET', 
             success: function (data) {
                 console.log(data)
-                repo = data
-                $.each( repo.templates, function( i, val ) {
+                repoData = data
+                $.each( repoData.templates, function( i, val ) {
                     $('#templateSelect').append($('<option>', {
                         value: val.name,
                         text: val.name
@@ -66,14 +71,15 @@ $(function(){
     });
     
     $('#templateSelect').on('change', function(e) {
+        templateName = $(this).val()
         e.preventDefault();
         $('#varsSelect :not(:first-child)').remove();
         console.log("get template");
         $.ajax({
-            url: '/repos/' + $('#repoSelect').val() + '/contents' + repo.templates_dir,
+            url: '/repos/' + repoName + '/contents' + repoData.templates_dir,
             type: 'GET', 
             data: { 
-                name: $(this).val(),
+                name: templateName,
             },
             success: function (data) {
                 console.log(data)
@@ -83,14 +89,38 @@ $(function(){
                 alert(xhr.status + ": " + xhr.responseText);
             }
           });
-        console.log($(this).prop('selectedIndex'));
-        //repo.templates[$(this).prop('selectedIndex'))].template_vars;
-        /*$.each( , function( i, val ) {
+        console.log(repoName, templateName);
+        templateVarFiles = repoData.templates.find(function(tpl){
+            return tpl.name === templateName
+        }).var_files;
+        console.log(templateVarFiles)
+        $.each(templateVarFiles , function( i, val ) {
             $('#varsSelect').append($('<option>', {
-                value: val.name,
-                text: val.name
+                value: val,
+                text: val
             }));
-        });*/
+        });
+    });
+
+    $('#varsSelect').on('change', function(e) {
+        templateVarsName = $(this).val()
+        e.preventDefault();
+        $('#varsSelect :not(:first-child)').remove();
+        console.log("get template");
+        $.ajax({
+            url: '/repos/' + repoName + '/contents' + repoData.vars_dir,
+            type: 'GET', 
+            data: { 
+                name: templateVarsName,
+            },
+            success: function (data) {
+                console.log(data)
+                varEditor.setValue(data);
+            },
+            error: function (xhr,errmsg,err) {
+                alert(xhr.status + ": " + xhr.responseText);
+            }
+        });
     });
 
     $('#clear').on('click', function(e) {
