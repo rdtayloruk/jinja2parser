@@ -44,13 +44,11 @@ $(function(){
     $('#repoSelect').on('change', function(e) {
         e.preventDefault();
         $('#templateSelect :not(:first-child)').remove();
+        $('#varsSelect :not(:first-child)').remove();
         console.log("get templates")
         $.ajax({
             url: '/repos/' + $(this).val() + '/templates',
             type: 'GET', 
-            /*data: { 
-                repo: $(this).val(),
-            },*/
             success: function (data) {
                 console.log(data)
                 repo = data
@@ -98,6 +96,10 @@ $(function(){
     $('#clear').on('click', function(e) {
         tplEditor.setValue('');
         varEditor.setValue('')
+        $('#repoSelect :not(:first-child)').remove();
+        $('#repoBranchSelect :not(:first-child)').remove();
+        $('#templateSelect :not(:first-child)').remove();
+        $('#varsSelect :not(:first-child)').remove();
     });
 
     $('#copy').on('click', function(e) {
