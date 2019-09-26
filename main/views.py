@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
-from jinja2 import Environment, meta, exceptions, Undefined, StrictUndefined
+from jinja2 import Environment, meta, exceptions, DebugUndefined, StrictUndefined
 import yaml, json, base64, re
 from main.gitea import GiteaAPI
 
@@ -20,32 +20,33 @@ def index(request):
 
 @require_POST
 def convert(request):
-    trim_blocks = request.POST.get('trim_blocks', True)
-    lstrip_blocks = request.POST.get('lstrip_blocks', True)
-    if request.POST.get('strict_undefined'):
+    payload = json.loads(request.body.decode('utf-8'))
+    trim_blocks = payload.get('trim_blocks', True)
+    lstrip_blocks = payload.get('lstrip_blocks', True)
+    if payload.get('strict_undefined'):
         undefined = StrictUndefined
     else:
-        undefined = Undefined
+        undefined = DebugUndefined
 
     jinja2_env = Environment(trim_blocks=trim_blocks, lstrip_blocks=lstrip_blocks, undefined=undefined)
 
     # Load the template
     try:
-        jinja2_tpl = jinja2_env.from_string(request.POST.get('template'))
+        jinja2_tpl = jinja2_env.from_string(payload.get('template'))
     except (exceptions.TemplateSyntaxError, exceptions.TemplateError) as e:
         return HttpResponse("Syntax error in jinja2 template: {0}".format(e), status=400)
 
     # Load vars
     try:
-        values = yaml.safe_load(request.POST.get('templateVars'))
+        values = yaml.safe_load(payload.get('templateVars'))
     except (ValueError, yaml.YAMLError, TypeError) as e:
-        return HttpResponse("Value error in YAML: {0}".format(e), status=400)
+        return HttpResponse("Value Error in YAML: {0}".format(e), status=400)
     
      # Render template
     try:
         rendered_jinja2_tpl = jinja2_tpl.render(values)
     except (exceptions.TemplateRuntimeError, ValueError, TypeError) as e:
-        return HttpResponse("Error in your values input filed: {0}".format(e), status=400)
+        return HttpResponse("Error in vars: {0}".format(e), status=400)
 
     return HttpResponse(rendered_jinja2_tpl)
 

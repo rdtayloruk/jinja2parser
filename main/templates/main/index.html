@@ -29,7 +29,7 @@
             <div class="input-group input-group-sm row col-md-6 mb-2">
                 <label for="repoSelect" class="col-sm-4 col-form-label">Repository</label>
                 <div class="col-sm-8">
-                    <select class="custom-select-sm form-control" id="repoSelect" required>
+                    <select class="custom-select-sm form-control" id="repoSelect" required disabled>
                         <option>Choose...</option>
                         {% for repo in repos %}
                         <option>{{repo}}</option>
@@ -38,7 +38,7 @@
                 </div>
             </div>
             <div class="input-group input-group-sm row col-md-2 mb-2">
-                    <select class="custom-select-sm form-control" id="repoBranchSelect" required>
+                    <select class="custom-select-sm form-control" id="repoBranchSelect" required disabled>
                         <option><a href="#">master</a></option>
                         <option><a href="#">dev1</a></option>
                     </select>
@@ -49,7 +49,7 @@
             <div class="input-group input-group-sm row col-md-6 mb-2">
                 <label for="templateSelect" class="col-sm-4 col-form-label">Template</label>
                 <div class="col-sm-8">
-                    <select class="custom-select-sm form-control" id="templateSelect" required>
+                    <select class="custom-select-sm form-control" id="templateSelect" required disabled>
                         <option value="">Choose...</option>
                     </select>
                 </div>
@@ -59,7 +59,7 @@
             <div class="input-group input-group-sm row col-md-6 mb-2">
                 <label for="varsSelect" class="col-sm-4 col-form-label">Variables</label>
                 <div class="col-sm-8">
-                    <select class="custom-select-sm form-control" id="varsSelect" required>
+                    <select class="custom-select-sm form-control" id="varsSelect" required disabled>
                         <option value="">Choose...</option>
                     </select>
                 </div>
@@ -105,6 +105,7 @@
                 <button type="submit" class="btn btn-secondary" id="save">Save</button>
             </div>
         </div>
+        
     </div>
 </body>
 

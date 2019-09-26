@@ -45,7 +45,8 @@ $(function(){
         }
     });
 
-    $('#repoSelect').on('change', function(e) {
+
+    /*$('#repoSelect').on('change', function(e) {
         e.preventDefault();
         $('#templateSelect :not(:first-child)').remove();
         $('#varsSelect :not(:first-child)').remove();
@@ -121,15 +122,15 @@ $(function(){
                 alert(xhr.status + ": " + xhr.responseText);
             }
         });
-    });
+    });*/
 
     $('#clear').on('click', function(e) {
         tplEditor.setValue('');
         varEditor.setValue('')
-        $('#repoSelect :not(:first-child)').remove();
+       /* $('#repoSelect :not(:first-child)').remove();
         $('#repoBranchSelect :not(:first-child)').remove();
         $('#templateSelect :not(:first-child)').remove();
-        $('#varsSelect :not(:first-child)').remove();
+        $('#varsSelect :not(:first-child)').remove();*/
     });
 
     $('#copy').on('click', function(e) {
@@ -151,18 +152,19 @@ $(function(){
         $.ajax({
             url: '/convert',
             type: 'POST', 
-            data: { 
+            data: JSON.stringify({ 
                 template: tplEditor.getValue(),
                 templateVars: varEditor.getValue(),
                 trim_blocks: $('#trimBlocks').prop('checked'),
                 lstrip_blocks: $('#lstripBlocks').prop('checked'),
                 strict_undefined: $('#strictUndefined').prop('checked')
-            },
+            }),
+            dataType: 'json',
             success: function (data) {
                 tplEditor.setValue(data)
             },
             error: function (xhr,errmsg,err) {
-                alert(xhr.status + ": " + xhr.responseText);
+                alert(xhr.responseText);
             }
           });
     });
