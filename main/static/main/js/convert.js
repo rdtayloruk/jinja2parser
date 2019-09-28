@@ -161,6 +161,7 @@ $(function(){
             }),
             dataType: 'json',
             success: function (data) {
+                console.log(data)
                 tplEditor.setValue(data)
             },
             error: function (xhr,errmsg,err) {
