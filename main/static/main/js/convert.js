@@ -152,14 +152,14 @@ $(function(){
         $.ajax({
             url: '/convert',
             type: 'POST', 
-            data: JSON.stringify({ 
+            data: { 
                 template: tplEditor.getValue(),
                 templateVars: varEditor.getValue(),
                 trim_blocks: $('#trimBlocks').prop('checked'),
                 lstrip_blocks: $('#lstripBlocks').prop('checked'),
                 strict_undefined: $('#strictUndefined').prop('checked')
-            }),
-            dataType: 'json',
+            },
+            //dataType: 'json',
             success: function (data) {
                 console.log(data)
                 tplEditor.setValue(data)

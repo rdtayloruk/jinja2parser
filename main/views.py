@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
-from jinja2 import Environment, meta, exceptions, DebugUndefined, StrictUndefined
+from jinja2 import Environment, meta, exceptions, Undefined, StrictUndefined
 import yaml, json, base64, re
 from main.gitea import GiteaAPI
 
@@ -20,25 +20,33 @@ def index(request):
 
 @require_POST
 def convert(request):
-    payload = json.loads(request.body.decode('utf-8'))
-    trim_blocks = payload.get('trim_blocks', True)
-    lstrip_blocks = payload.get('lstrip_blocks', True)
-    if payload.get('strict_undefined'):
-        undefined = StrictUndefined
-    else:
-        undefined = DebugUndefined
+    print(request.POST.get('trim_blocks'))
+    options = {}
+    if request.POST.get('lstrip_blocks') == "true":
+        options['lstrip_blocks'] = True
+    elif request.POST.get('lstrip_blocks') == "false":
+        options['lstrip_blocks'] = False
+    if request.POST.get('trim_blocks') == "true":
+        options['trim_blocks'] = True
+    elif request.POST.get('trim_blocks') == "false":
+        options['trim_blocks'] = False
+    if request.POST.get('strict_undefined') == "true":
+        options['undefined'] = StrictUndefined
+    elif request.POST.get('strict_undefined') == "false":
+        options['undefined'] = Undefined
+        
 
-    jinja2_env = Environment(trim_blocks=trim_blocks, lstrip_blocks=lstrip_blocks, undefined=undefined)
+    jinja2_env = Environment(**options)
 
     # Load the template
     try:
-        jinja2_tpl = jinja2_env.from_string(payload.get('template'))
+        jinja2_tpl = jinja2_env.from_string(request.POST.get('template'))
     except (exceptions.TemplateSyntaxError, exceptions.TemplateError) as e:
         return HttpResponse("Syntax error in jinja2 template: {0}".format(e), status=400)
 
     # Load vars
     try:
-        values = yaml.safe_load(payload.get('templateVars'))
+        values = yaml.safe_load(request.POST.get('templateVars'))
     except (ValueError, yaml.YAMLError, TypeError) as e:
         return HttpResponse("Value Error in YAML: {0}".format(e), status=400)
     
