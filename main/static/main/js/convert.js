@@ -134,10 +134,12 @@ $(function(){
     });
 
     $('#copy').on('click', function(e) {
+        console.log("copy...")
         e.preventDefault();
-        tplEditor.focus();
-        tplEditor.select();
-	    document.execCommand('copy')
+        tplEditor.save();
+        console.log($('#template').text());
+        $('#template').select();
+	    document.execCommand('copy');
         // copy to clipboard
     });
 

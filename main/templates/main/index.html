@@ -9,6 +9,7 @@
     <script src="{% static 'main/plugins/codemirror/mode/javascript/javascript.js' %}"></script>
     <script src="{% static 'main/plugins/codemirror/mode/yaml/yaml.js' %}"></script>
     <script src="{% static 'main/plugins/codemirror/mode/jinja2/jinja2.js' %}"></script>
+    <script src="{% static 'main/js/clipboard.min.js' %}"></script>
     <script src="{% static 'main/js/convert.js' %}"></script>
 
     <link rel="stylesheet" type="text/css" href="{% static 'main/css/bootstrap.min.css' %}">
@@ -99,9 +100,9 @@
         </div>
         <div class="row mt-3">
             <div class="col-md-12">
-                <button type="submit" class="btn btn-success" id="convert">Convert</button>
-                <button type="submit" class="btn btn-danger" id="clear">Clear</button>
-                <button type="submit" class="btn btn-warning" id="copy">Copy</button>
+                <button type="submit" class="btn btn-secondary" id="convert">Convert</button>
+                <button type="submit" class="btn btn-secondary" id="clear">Clear</button>
+                <button type="submit" class="btn btn-secondary" id="copy">Copy</button>
                 <button type="submit" class="btn btn-secondary" id="save">Save</button>
             </div>
         </div>
