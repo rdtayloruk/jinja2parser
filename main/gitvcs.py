@@ -1,5 +1,5 @@
 import subprocess, logging
-from git import Repo
+import git
 from git.exc import BadName, InvalidGitRepositoryError
 
 log = logging.getLogger(__name__)
@@ -22,7 +22,9 @@ class GitVCS():
         cmd = ['git', 'fetch', '--tags']
         subprocess.call(cmd)
     
-    def checkout_version(self, version='master')
+    def checkout_version(self, version='master'):
+        cmd = ['git', 'checkout', version ]
+        subprocess.call(cmd)
         pass
     
     
@@ -43,17 +45,11 @@ class GitVCS():
         repo = git.Repo(self.working_dir)
         for tag in repo.tags:
             try:
-                versions.append(VCSVersion(self, str(tag.commit), str(tag)))
+                versions.append(tag.name)
             except ValueError:
-                # ValueError: Cannot resolve commit as tag TAGNAME points to a
-                # blob object - use the `.object` property instead to access it
-                # This is not a real tag for us, so we skip it
-                # https://github.com/rtfd/readthedocs.org/issues/4440
-                log.warning('Git tag skipped: %s', tag, exc_info=True)
+                log.warning('Git tag skipped: %s', tag)
                 continue
         return versions
-
-
 
     @property
     def branches(self):
@@ -71,5 +67,5 @@ class GitVCS():
                 verbose_name = verbose_name.replace('origin/', '')
             if verbose_name == 'HEAD':
                 continue
-            versions.append(VCSVersion(self, str(branch), verbose_name))
+            versions.append(verbose_name)
         return versions
