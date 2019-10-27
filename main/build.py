@@ -1,4 +1,4 @@
-import subprocess, logging
+import os, subprocess, logging
 import git
 from git.exc import BadName, InvalidGitRepositoryError
 
@@ -7,9 +7,12 @@ log = logging.getLogger(__name__)
 class Repo():
 
     def __init__(self, name, url, working_dir):
+        """Create Repo object, create working dir if it does not exist"""
         self.name = name
         self.url = url
         self.working_dir = working_dir
+        if not os.path.isdir(self.working_dir):
+            os.makedirs(self.working_dir)
 
     def update(self):
         """Clone or update the repository."""
@@ -25,7 +28,6 @@ class Repo():
     def checkout_version(self, version='master'):
         cmd = ['git', 'checkout', version ]
         subprocess.check_call(cmd, cwd=self.working_dir)
-        pass
     
     def clone(self):
         cmd = ['git', 'clone', self.url, self.working_dir]
@@ -67,6 +69,13 @@ class Repo():
                 continue
             versions.append(verbose_name)
         return versions
+        
+    def hexsha(self, version=None):
+        repo = git.Repo(self.working_dir)
+        if version:
+            return repo.commit(version).hexsha
+        else:
+            return repo.head.object.hexsha
         
 def build(project):
     pass
