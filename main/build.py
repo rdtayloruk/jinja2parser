@@ -4,12 +4,12 @@ from git.exc import BadName, InvalidGitRepositoryError
 
 log = logging.getLogger(__name__)
 
-class GitVCS():
+class Repo():
 
-    def __init__(self, project):
-        self.repo_url = project.url
-        self.name = project.name
-        self.working_dir = project.working_dir
+    def __init__(self, name, url, working_dir):
+        self.name = name
+        self.url = url
+        self.working_dir = working_dir
 
     def update(self):
         """Clone or update the repository."""
@@ -20,17 +20,16 @@ class GitVCS():
     
     def fetch(self):
         cmd = ['git', 'fetch', '--tags']
-        subprocess.call(cmd)
+        subprocess.check_call(cmd, cwd=self.working_dir)
     
     def checkout_version(self, version='master'):
         cmd = ['git', 'checkout', version ]
-        subprocess.call(cmd)
+        subprocess.check_call(cmd, cwd=self.working_dir)
         pass
     
-    
     def clone(self):
-        cmd = ['git', 'clone', self.repo_url]
-        subprocess.call(cmd)
+        cmd = ['git', 'clone', self.url, self.working_dir]
+        subprocess.check_call(cmd)
     
     def repo_exists(self):
         try:
@@ -57,7 +56,6 @@ class GitVCS():
         versions = []
         branches = []
 
-        # ``repo.remotes.origin.refs`` returns remote branches
         if repo.remotes:
             branches += repo.remotes.origin.refs
 
@@ -69,3 +67,19 @@ class GitVCS():
                 continue
             versions.append(verbose_name)
         return versions
+        
+def build(project):
+    pass
+    # creat VCS object
+   # project = 
+    #repo = Repo()
+    # update
+    # get revisions
+    # for each revision
+    #    if revision in project.revisions
+    #       if revision.sha chnaged: 
+    #           update
+    #    else:
+    #       add new revision
+    # sort revisions by age
+    # keep X most recent

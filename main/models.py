@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
@@ -13,7 +14,7 @@ class Project(models.Model):
     
     @property
     def project_path(self):
-        return os.path.join(settings.MEDIAROOT, 'projects', self.slug.replace('_', '-'))
+        return os.path.join(settings.MEDIA_ROOT, 'projects', self.slug.replace('_', '-'))
     
     @property
     def working_dir(self):
@@ -29,6 +30,7 @@ class Project(models.Model):
         super().save(*args, **kwargs)
     
 class Version(models.Model):
+    hexsha = models.CharField(max_length=200, unique=True)
     name = models.CharField(max_length=200)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     
