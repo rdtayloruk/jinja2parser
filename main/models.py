@@ -32,7 +32,7 @@ class Project(models.Model):
 class Version(models.Model):
     hexsha = models.CharField(max_length=200, unique=True)
     name = models.CharField(max_length=200)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name = 'versions')
     
     def __str__(self):
         return self.name
@@ -40,15 +40,15 @@ class Version(models.Model):
 class Template(models.Model):
     name = models.CharField(max_length=200)
     path = models.FileField(upload_to=None)
-    version = models.ForeignKey(Version, on_delete=models.CASCADE)
+    version = models.ForeignKey(Version, on_delete=models.CASCADE, related_name = 'templates')
     
     def __str__(self):
         return self.name
     
-class TemplateData(models.Model):
+class VarFile(models.Model):
     name = models.CharField(max_length=200)
     path = models.FileField(upload_to=None)
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.CASCADE, related_name = 'varfiles')
     
     def __str__(self):
         return self.name

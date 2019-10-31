@@ -1,4 +1,4 @@
-import os, subprocess, logging
+import os, subprocess, logging, shutil
 import git
 from git.exc import BadName, InvalidGitRepositoryError
 
@@ -13,25 +13,35 @@ class Repo():
         self.working_dir = working_dir
         if not os.path.isdir(self.working_dir):
             os.makedirs(self.working_dir)
-
+            
     def update(self):
         """Clone or update the repository."""
         if self.repo_exists():
-            return self.fetch()
+            self.fetch()
         else:
-            return self.clone()
+            self.clone()
+    
+    def clean(self):
+        shutil.rmtree(self.working_dir)
+        
+            
+    def __call(self, cmd):
+        try:
+            subprocess.check_call(cmd, cwd=self.working_dir)
+        except CalledProcessError as e:
+            log.exception("%s. Error calling: %s", self.name, cmd)
     
     def fetch(self):
         cmd = ['git', 'fetch', '--tags']
-        subprocess.check_call(cmd, cwd=self.working_dir)
+        self.__call(cmd)
     
     def checkout_version(self, version='master'):
         cmd = ['git', 'checkout', version ]
-        subprocess.check_call(cmd, cwd=self.working_dir)
+        self.__call(cmd)
     
     def clone(self):
         cmd = ['git', 'clone', self.url, self.working_dir]
-        subprocess.check_call(cmd)
+        self.__call(cmd)
     
     def repo_exists(self):
         try:
@@ -77,18 +87,28 @@ class Repo():
         else:
             return repo.head.object.hexsha
         
-def build(project):
-    pass
-    # creat VCS object
-   # project = 
-    #repo = Repo()
-    # update
+
+def update_build(project):
+    repo = Repo(
+        name = project.name,
+        url =  project.url,
+        working_dir = project.working_dir )
+    repo.update()
     # get revisions
-    # for each revision
-    #    if revision in project.revisions
-    #       if revision.sha chnaged: 
-    #           update
-    #    else:
+    new_versions = repo.branches + repo.tags
+    old_versions = project.versions
+    for version in old_versions:
+        if version.name in new_versions:
+            if version.hexsha != repo.hexsha(version.name):
+            """rebuild version"""
+        else:
+            """cleanup old version"""
+    for version in new_versions:
+        if version not in old_versions:
+            """add new version"""
     #       add new revision
     # sort revisions by age
     # keep X most recent
+    
+def delete_build(project):
+    pass
