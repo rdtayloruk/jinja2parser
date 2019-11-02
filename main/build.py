@@ -1,5 +1,4 @@
 import os, subprocess, logging, shutil
-from .models import Project, Version, Template, VarFile
 import git
 from git.exc import BadName, InvalidGitRepositoryError
 
@@ -25,7 +24,6 @@ class Repo():
     def clean(self):
         shutil.rmtree(self.working_dir)
         
-            
     def __call(self, cmd):
         try:
             subprocess.check_call(cmd, cwd=self.working_dir)
@@ -95,38 +93,4 @@ class Repo():
         else:
             return repo.head.object.hexsha
         
-
-def update_project(project):
-    repo = Repo(
-        name = project.name,
-        url =  project.url,
-        working_dir = project.working_dir )
-    repo.update()
-    # get revisions
-    new_versions = repo.branches + repo.tags
-    # update or delete current versions
-    for version in project.versions:
-        if version.name in new_versions:
-            if version.hexsha != repo.hexsha(version.name):
-            """rebuild version"""
-        else:
-            """cleanup old version"""
-    # create new versions
-    for version in new_versions:
-        if version not in project.versions:
-            Version.objects.create(
-                name=version, 
-                project = project,
-                hexsha=repo.hexsha(version.name),
-                committed_date = repo.committed_date(version.name)
-                )
-    #       add new revision
-    # sort revisions by age
-    # keep X most recent
-    
-def delete_version(project):
-    pass
-
-def update_version(version):
-    # load template def
     

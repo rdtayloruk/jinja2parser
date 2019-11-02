@@ -1,12 +1,18 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 
-from .models import Project
+from .models import Project, Version
 
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ('name','url')
     fields = ('name', 'url', 'template_def', 'slug','webhook_key')
-    readonly_fields = ('webhook_key',)
+    readonly_fields = ('slug', 'webhook_key')
+
+class VersionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'hexsha', 'committed_date')
+    fields = ('name', 'hexsha', 'committed_date')
+    readonly_fields = ('name', 'hexsha', 'committed_date')
     
 
 admin.site.register(Project, ProjectAdmin)
+admin.site.register(Version, VersionAdmin)
