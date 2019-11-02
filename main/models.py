@@ -6,7 +6,7 @@ from django.conf import settings
 
 
 class Project(models.Model):
-    name = models.CharField( verbose_name="Project Name", max_length=200 )
+    name = models.CharField(verbose_name="Project Name", max_length=200 )
     slug = models.SlugField(verbose_name="Slug", unique=True)
     url = models.URLField(verbose_name="Project URL")
     template_def = models.CharField(verbose_name="Jinja2 Definition File", max_length=200 )
@@ -31,7 +31,10 @@ class Project(models.Model):
     
 class Version(models.Model):
     hexsha = models.CharField(max_length=200, unique=True)
+    committed_date = models.DateTimeField()
     name = models.CharField(max_length=200)
+    templates_dir = models.CharField(max_length=200)
+    vars_dir = models.CharField(max_length=200)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name = 'versions')
     
     def __str__(self):

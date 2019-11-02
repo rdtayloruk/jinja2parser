@@ -1,4 +1,5 @@
 import os, subprocess, logging, shutil
+from .models import Project, Version, Template, VarFile
 import git
 from git.exc import BadName, InvalidGitRepositoryError
 
@@ -80,6 +81,13 @@ class Repo():
             versions.append(verbose_name)
         return versions
         
+    def committed_date(self, version=None):
+        repo = git.Repo(self.working_dir)
+        if version:
+            return repo.commit(version).committed_date
+        else:
+            return repo.head.object.committed_date
+        
     def hexsha(self, version=None):
         repo = git.Repo(self.working_dir)
         if version:
@@ -88,7 +96,7 @@ class Repo():
             return repo.head.object.hexsha
         
 
-def update_build(project):
+def update_project(project):
     repo = Repo(
         name = project.name,
         url =  project.url,
@@ -96,19 +104,29 @@ def update_build(project):
     repo.update()
     # get revisions
     new_versions = repo.branches + repo.tags
-    old_versions = project.versions
-    for version in old_versions:
+    # update or delete current versions
+    for version in project.versions:
         if version.name in new_versions:
             if version.hexsha != repo.hexsha(version.name):
             """rebuild version"""
         else:
             """cleanup old version"""
+    # create new versions
     for version in new_versions:
-        if version not in old_versions:
-            """add new version"""
+        if version not in project.versions:
+            Version.objects.create(
+                name=version, 
+                project = project,
+                hexsha=repo.hexsha(version.name),
+                committed_date = repo.committed_date(version.name)
+                )
     #       add new revision
     # sort revisions by age
     # keep X most recent
     
-def delete_build(project):
+def delete_version(project):
     pass
+
+def update_version(version):
+    # load template def
+    
