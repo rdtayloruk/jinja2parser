@@ -11,6 +11,7 @@ class Repo():
         self.name = name
         self.url = url
         self.working_dir = working_dir
+        log.info("creating repo: %s", self.name)
         if not os.path.isdir(self.working_dir):
             os.makedirs(self.working_dir)
             
@@ -71,12 +72,9 @@ class Repo():
             branches += repo.remotes.origin.refs
 
         for branch in branches:
-            verbose_name = branch.name
-            if verbose_name.startswith('origin/'):
-                verbose_name = verbose_name.replace('origin/', '')
-            if verbose_name == 'HEAD':
+            if branch.name == 'origin/HEAD':
                 continue
-            versions.append(verbose_name)
+            versions.append(branch.name)
         return versions
         
     def committed_date(self, version=None):

@@ -9,9 +9,9 @@ class ProjectAdmin(admin.ModelAdmin):
     readonly_fields = ('slug', 'webhook_key')
 
 class VersionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'hexsha', 'committed_date')
-    fields = ('name', 'hexsha', 'committed_date')
-    readonly_fields = ('name', 'hexsha', 'committed_date')
+    list_display = ('name', 'project', 'hexsha', 'committed_date')
+    fields = ('name', 'project', 'hexsha', 'committed_date')
+    readonly_fields = ('name', 'project','hexsha', 'committed_date')
     
 
 admin.site.register(Project, ProjectAdmin)

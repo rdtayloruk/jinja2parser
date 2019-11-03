@@ -1,4 +1,5 @@
-import os
+import os, shutil
+from datetime import datetime, timezone
 from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
@@ -34,16 +35,21 @@ class Project(models.Model):
         versions = repo.branches + repo.tags
         # update or create new versions
         for version in versions:
+            committed_date = datetime.fromtimestamp(repo.committed_date(version), timezone.utc)
+            hexsha = repo.hexsha(version)
             Version.objects.update_or_create(
                 name = version, 
                 project = self,
                 defaults = {
-                    'hexsha': repo.hexsha(version),
-                    'committed_date': repo.committed_date(version)
+                    'hexsha': hexsha,
+                    'committed_date': committed_date
                 }
             )
         # sort revisions by age
         # keep X most recent
+        
+    def clean_project(self):
+        shutil.rmtree(self.project_path)
     
     def __str__(self):
         return self.name
@@ -54,12 +60,16 @@ class Project(models.Model):
             self.webhook_key = get_random_string(length=25)
         super().save(*args, **kwargs)
         self.update_project()
+        
+    def delete(self, *args, **kwargs):
+        self.clean_project()
+        super().save(*args, **kwargs)
     
 class Version(models.Model):
     name = models.CharField(max_length=200)
     project = models.ForeignKey(Project, on_delete=models.CASCADE,
                                 related_name = 'versions')
-    hexsha = models.CharField(max_length=200, unique=True)
+    hexsha = models.CharField(max_length=200)
     committed_date = models.DateTimeField()
     templates_dir = models.CharField(max_length=200, blank=True)
     vars_dir = models.CharField(max_length=200, blank=True)
