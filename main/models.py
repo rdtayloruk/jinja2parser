@@ -44,9 +44,7 @@ class Project(models.Model):
                     'hexsha': hexsha,
                     'committed_date': committed_date
                 }
-            )
-        # sort revisions by age
-        # keep X most recent
+            ) 
         
     def clean_project(self):
         shutil.rmtree(self.project_path)
@@ -63,7 +61,7 @@ class Project(models.Model):
         
     def delete(self, *args, **kwargs):
         self.clean_project()
-        super().save(*args, **kwargs)
+        super().delete(*args, **kwargs)
     
 class Version(models.Model):
     name = models.CharField(max_length=200)
