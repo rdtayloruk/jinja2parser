@@ -1,4 +1,4 @@
-import shutil
+import os, shutil
 from datetime import datetime, timezone
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
@@ -22,7 +22,8 @@ def update_project(sender, instance, created, **kwargs):
         repo = Repo(
             name = instance.name,
             url =  instance.url,
-            working_dir = instance.working_dir )
+            working_dir = instance.working_dir 
+            )
         repo.update()
         # get revisions
         versions = repo.branches + repo.tags
@@ -38,3 +39,19 @@ def update_project(sender, instance, created, **kwargs):
                     'committed_date': committed_date
                 }
             ) 
+
+"""
+parse version template def, create templates
+"""
+@receiver(post_save, sender=Version)
+def update_templates(sender, instance, created, **kwargs)
+    template_def = instance.project.template_def
+    # checkout version
+    repo = Repo(
+            name = instance.project.name,
+            url =  instance.project.url,
+            working_dir = instance.project.working_dir 
+            )
+    repo.checkout_version(instance.name)
+    # parse template_def, create templates => need try except here
+    templates = json.loads(os.path.join(repo.working_dir, template_def))

@@ -65,16 +65,3 @@ class VarFile(models.Model):
     def __str__(self):
         return self.name
         
-# Utility
-
-
-    
-def update_version(version):
-    pass
-    
-def delete_version(project):
-    pass
-
-def update_version(version):
-    pass
-    # load template def
