@@ -13,6 +13,7 @@ class Repo():
         self.working_dir = working_dir
         log.info("creating repo: %s", self.name)
         if not os.path.isdir(self.working_dir):
+            log.info("creating working_dir: %s", self.working_dir)
             os.makedirs(self.working_dir)
             
     def update(self):
@@ -23,6 +24,7 @@ class Repo():
             self.clone()
     
     def clean(self):
+        log.info("removing workingdir: %s", self.working_dir)
         shutil.rmtree(self.working_dir)
         
     def __call(self, cmd):
