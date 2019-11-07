@@ -1,10 +1,12 @@
-import os, shutil
+import os, shutil, logging, json
 from datetime import datetime, timezone
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from main.models import Project, Version
+from main.models import Project, Version, Template
 from main.build import Repo
+
+log = logging.getLogger(__name__)
 
 """
 cleanup project directory after delete
@@ -43,9 +45,8 @@ def update_project(sender, instance, created, **kwargs):
 """
 parse version template def, create templates
 """
-@receiver(post_save, sender=Version)
-def update_templates(sender, instance, created, **kwargs)
-    template_def = instance.project.template_def
+#@receiver(post_save, sender=Version)
+def update_templates(sender, instance, created, **kwargs):
     # checkout version
     repo = Repo(
             name = instance.project.name,
@@ -54,4 +55,15 @@ def update_templates(sender, instance, created, **kwargs)
             )
     repo.checkout_version(instance.name)
     # parse template_def, create templates => need try except here
-    templates = json.loads(os.path.join(repo.working_dir, template_def))
+    template_def = {}
+    with open(os.path.join(repo.working_dir, instance.project.template_def)) as f:
+        try:
+            template_def = json.load(f)
+        except ValueError as e:
+            log.warning("Failed to load template def: %s", template_def)
+    templates_dir = template_def.get("templates_dir")
+    vars_dir = template_def.get("vars_dir")
+    templates = template_def.get("templates")
+    log.info(templates)
+ 
+        
