@@ -45,7 +45,7 @@ def update_project(sender, instance, created, **kwargs):
 """
 parse version template def, create templates
 """
-#@receiver(post_save, sender=Version)
+@receiver(post_save, sender=Version)
 def update_templates(sender, instance, created, **kwargs):
     # checkout version
     repo = Repo(
@@ -54,16 +54,25 @@ def update_templates(sender, instance, created, **kwargs):
             working_dir = instance.project.working_dir 
             )
     repo.checkout_version(instance.name)
+    # cleanup version directory and copy new files
+    if os.path.exists(instance.version_path):
+        shutil.rmtree(instance.version_path)
+    shutil.copytree(repo.working_dir, instance.version_path)
     # parse template_def, create templates => need try except here
-    template_def = {}
-    with open(os.path.join(repo.working_dir, instance.project.template_def)) as f:
-        try:
-            template_def = json.load(f)
-        except ValueError as e:
-            log.warning("Failed to load template def: %s", template_def)
-    templates_dir = template_def.get("templates_dir")
-    vars_dir = template_def.get("vars_dir")
-    templates = template_def.get("templates")
-    log.info(templates)
+    template_def = instance.project.template_def
+    try:
+        with open(os.path.join(repo.working_dir, template_def)) as f:
+            tmpl_json = json.load(f)
+            template_dir = tmpl_json['templates_dir']
+            templates = tmpl_json['templates']
+            for tmpl in templates:
+                Template.objects.create(
+                    name = tmpl['name'],
+                    path = os.path.join(instance.version_path, template_dir),
+                    version = instance
+                    )
+    except Exception as e:
+        log.warning("Failed to load template def: %s", template_def)
+
  
         

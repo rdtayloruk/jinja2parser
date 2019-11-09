@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 
-from .models import Project, Version
+from .models import Project, Version, Template, VarFile
 
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ('name','url')
@@ -10,9 +10,21 @@ class ProjectAdmin(admin.ModelAdmin):
 
 class VersionAdmin(admin.ModelAdmin):
     list_display = ('name', 'project', 'hexsha', 'committed_date')
-    fields = ('name', 'project', 'hexsha', 'committed_date')
-    readonly_fields = ('name', 'project','hexsha', 'committed_date')
+    list_filter = ('project__name',)
+    fields = ('name', 'project', 'hexsha', 'committed_date', 'slug', 'version_path')
+    readonly_fields = ('name', 'project','hexsha', 'committed_date', 'slug','version_path')
+
+class TemplateAdmin(admin.ModelAdmin):
+    list_display = ('name', 'version', 'project')
+    list_filter = ('version__project__name',)
+    fields = ('name', 'path', 'version')
+    readonly_fields = ('name', 'path', 'version')
+    
+    def project(self, obj):
+        return obj.version.project.name
+    
     
 
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Version, VersionAdmin)
+admin.site.register(Template, TemplateAdmin)

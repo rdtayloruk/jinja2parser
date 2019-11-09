@@ -1,4 +1,4 @@
-import os
+import os, re
 from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
@@ -37,19 +37,28 @@ class Project(models.Model):
     
 class Version(models.Model):
     name = models.CharField(max_length=200)
+    slug = models.SlugField(verbose_name="Slug", unique=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE,
                                 related_name = 'versions')
     hexsha = models.CharField(max_length=200)
     committed_date = models.DateTimeField()
-    templates_dir = models.CharField(max_length=200, blank=True)
-    vars_dir = models.CharField(max_length=200, blank=True)
+    
+    @property
+    def version_path(self):
+        return os.path.join(self.project.project_path, 'versions',
+                            self.slug.replace('_', '-'))
     
     def __str__(self):
         return self.name
+        
+    def save(self, *args, **kwargs):
+        clean_name =  re.sub('\W+','-',self.name)
+        self.slug = slugify(clean_name)
+        super().save(*args, **kwargs)
 
 class Template(models.Model):
     name = models.CharField(max_length=200)
-    path = models.FileField(upload_to=None)
+    path = models.CharField(max_length=200)
     version = models.ForeignKey(Version, on_delete=models.CASCADE, 
                                 related_name = 'templates')
     
@@ -58,7 +67,7 @@ class Template(models.Model):
     
 class VarFile(models.Model):
     name = models.CharField(max_length=200)
-    path = models.FileField(upload_to=None)
+    path = models.CharField(max_length=200)
     template = models.ForeignKey(Template, on_delete=models.CASCADE,
                                  related_name = 'varfiles')
     
