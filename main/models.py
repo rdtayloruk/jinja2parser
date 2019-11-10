@@ -58,6 +58,7 @@ class Version(models.Model):
 
 class Template(models.Model):
     name = models.CharField(max_length=200)
+    description = models.CharField(max_length=200, blank=True)
     path = models.CharField(max_length=200)
     version = models.ForeignKey(Version, on_delete=models.CASCADE, 
                                 related_name = 'templates')
@@ -67,6 +68,7 @@ class Template(models.Model):
     
 class VarFile(models.Model):
     name = models.CharField(max_length=200)
+    description = models.CharField(max_length=200, blank=True)
     path = models.CharField(max_length=200)
     template = models.ForeignKey(Template, on_delete=models.CASCADE,
                                  related_name = 'varfiles')

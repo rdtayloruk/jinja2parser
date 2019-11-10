@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from main.models import Project, Version, Template
+from main.models import Project, Version, Template, VarFile
 from main.build import Repo
 
 log = logging.getLogger(__name__)
@@ -63,16 +63,25 @@ def update_templates(sender, instance, created, **kwargs):
     try:
         with open(os.path.join(repo.working_dir, template_def)) as f:
             tmpl_json = json.load(f)
-            template_dir = tmpl_json['templates_dir']
-            templates = tmpl_json['templates']
+            templates_dir = tmpl_json.get('templates_dir', '')
+            vars_dir = tmpl_json.get('vars_dir', '')
+            templates = tmpl_json.get('templates')
             for tmpl in templates:
-                Template.objects.create(
-                    name = tmpl['name'],
-                    path = os.path.join(instance.version_path, template_dir),
+                tmpl_obj = Template.objects.create(
+                    name = tmpl.get('name'),
+                    description = tmpl.get('description', ''),
+                    path = os.path.join(instance.version_path, templates_dir),
                     version = instance
                     )
+                var_files = tmpl.get('var_files')
+                for var_file in var_files:
+                    VarFile.objects.create(
+                        name = var_file,
+                        path = os.path.join(instance.version_path, vars_dir),
+                        template = tmpl_obj
+                        )
     except Exception as e:
-        log.warning("Failed to load template def: %s", template_def)
+        log.exception("Failed to load template def: %s", template_def)
 
  
         
