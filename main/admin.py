@@ -17,8 +17,8 @@ class VersionAdmin(admin.ModelAdmin):
 class TemplateAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'version', 'project')
     list_filter = ('version__project__name',)
-    fields = ('name', 'description', 'path', 'version')
-    readonly_fields = ('name', 'description', 'path', 'version')
+    fields = ('name', 'description', 'template', 'version')
+    readonly_fields = ('name', 'description', 'template', 'version')
     
     def project(self, obj):
         return obj.version.project.name
@@ -26,8 +26,8 @@ class TemplateAdmin(admin.ModelAdmin):
 class VarFileAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'template', 'version', 'project')
     list_filter = ('template__version__project__name', 'template__version__name', 'template__name',)
-    fields = ('name', 'description', 'path', 'template')
-    readonly_fields = ('name', 'description', 'path', 'template')
+    fields = ('name', 'description', 'varfile', 'template')
+    readonly_fields = ('name', 'description', 'varfile', 'template')
     
     def version(self, obj):
         return obj.template.version.name

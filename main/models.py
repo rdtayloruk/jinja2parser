@@ -56,23 +56,30 @@ class Version(models.Model):
         self.slug = slugify(clean_name)
         super().save(*args, **kwargs)
 
+
+def template_path(instance, filename):
+        return os.path.join(instance.version.version_path, 'templates', filename)
+
 class Template(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200, blank=True)
-    path = models.CharField(max_length=200)
+    template = models.FileField(upload_to=template_path)
     version = models.ForeignKey(Version, on_delete=models.CASCADE, 
                                 related_name = 'templates')
     
     def __str__(self):
         return self.name
+        
+def varfile_path(instance, filename):
+    return os.path.join(instance.template.version.version_path, 'varfiles', filename)
     
 class VarFile(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200, blank=True)
-    path = models.CharField(max_length=200)
+    varfile = models.FileField(upload_to=varfile_path)
     template = models.ForeignKey(Template, on_delete=models.CASCADE,
                                  related_name = 'varfiles')
-    
+                                 
     def __str__(self):
         return self.name
         

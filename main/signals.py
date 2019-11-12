@@ -1,4 +1,5 @@
 import os, shutil, logging, json
+from django.core.files import File
 from datetime import datetime, timezone
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
@@ -48,6 +49,7 @@ parse version template def, create templates
 @receiver(post_save, sender=Version)
 def update_templates(sender, instance, created, **kwargs):
     # checkout version
+    version = instance
     repo = Repo(
             name = instance.project.name,
             url =  instance.project.url,
@@ -66,20 +68,22 @@ def update_templates(sender, instance, created, **kwargs):
             templates_dir = tmpl_json.get('templates_dir', '')
             vars_dir = tmpl_json.get('vars_dir', '')
             templates = tmpl_json.get('templates')
+            """
             for tmpl in templates:
+                print("repo working dir %s" % repo.working_dir)
                 tmpl_obj = Template.objects.create(
                     name = tmpl.get('name'),
                     description = tmpl.get('description', ''),
-                    path = os.path.join(instance.version_path, templates_dir),
-                    version = instance
+                    template = File(open(os.path.join(repo.working_dir, templates_dir, tmpl.get('name')), 'rb')),
+                    version = version
                     )
                 var_files = tmpl.get('var_files')
                 for var_file in var_files:
                     VarFile.objects.create(
                         name = var_file,
-                        path = os.path.join(instance.version_path, vars_dir),
+                        varfile = File(open(os.path.join(repo.working_dir, vars_dir, var_file), 'rb')),
                         template = tmpl_obj
-                        )
+                        )"""
     except Exception as e:
         log.exception("Failed to load template def: %s", template_def)
 
