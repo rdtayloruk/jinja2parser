@@ -14,6 +14,7 @@
 
     <link rel="stylesheet" type="text/css" href="{% static 'main/css/bootstrap.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'main/plugins/codemirror/lib/codemirror.css' %} ">
+    <link rel="stylesheet" type="text/css" href="{% static 'main/plugins/codemirror/theme/ambiance.css' %} ">
     <link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
 
     <title>Jinja2 Template Parser</title>
@@ -27,18 +28,17 @@
             </div>
         </div>
         <div class="row">
-            <div class="input-group input-group-sm row col-md-6 mb-2">
-                <label for="repoSelect" class="col-sm-4 col-form-label">Repository</label>
-                <div class="col-sm-8">
+            <div class="input-group input-group-sm row col-md-3 mb-2">
+                <div class="col-sm-12">
                     <select class="custom-select-sm form-control" id="repoSelect" required>
-                        <option>Choose...</option>
+                        <option>Project...</option>
                         {% for project in projects %}
                         <option>{{project.name}}</option>
                         {% endfor %}
                     </select>
                 </div>
             </div>
-            <div class="input-group input-group-sm row col-md-2 mb-2">
+            <div class="input-group input-group-sm row col-md-1 mb-2">
                     <select class="custom-select-sm form-control" id="repoBranchSelect" required disabled>
                         <option><a href="#">master</a></option>
                         <option><a href="#">dev1</a></option>
@@ -47,31 +47,26 @@
         </div>
         
         <div class="row">
-            <div class="input-group input-group-sm row col-md-6 mb-2">
-                <label for="templateSelect" class="col-sm-4 col-form-label">Template</label>
-                <div class="col-sm-8">
+            <div class="input-group input-group-sm row col-md-3 mb-2">
+                <div class="col-sm-12">
                     <select class="custom-select-sm form-control" id="templateSelect" required disabled>
-                        <option value="">Choose...</option>
+                        <option value="">Template...</option>
                     </select>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="input-group input-group-sm row col-md-6 mb-2">
-                <label for="varsSelect" class="col-sm-4 col-form-label">Variables</label>
-                <div class="col-sm-8">
+            <div class="input-group input-group-sm row col-md-3 mb-2">
+                <div class="col-sm-12">
                     <select class="custom-select-sm form-control" id="varsSelect" required disabled>
-                        <option value="">Choose...</option>
+                        <option value="">Variable File...</option>
                     </select>
                 </div>
             </div>
         </div>    
 
         <div class="row mb-4">
-            <div class="col-md-2">
-                <span>Options</span>
-            </div>
-            <div class="col-md-10">
+            <div class="col-md-12">
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="trimBlocks" checked>
                     <label class="form-check-label" for="inlineCheckbox1">trim_blocks</label>
@@ -95,7 +90,7 @@
             </div>           
             <div class="form-group col-md-8">
                 <h5>Template</h5>
-                <textarea id="template" name="template" class="form-control" rows="20">{% include 'main/sample_template.j2' %}</textarea>
+                <textarea id="template" name="template" class="form-control">{% include 'main/sample_template.j2' %}</textarea>
             </div>
         </div>
         <div class="row mt-3">

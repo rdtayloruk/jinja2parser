@@ -8,12 +8,14 @@ $(function(){
 
     var varEditor = CodeMirror.fromTextArea($('#templateVars').get(0),{
         mode:  "yaml",
-        lineNumbers: true
+        lineNumbers: true,
+        theme: "ambiance"
       });
     
     var tplEditor = CodeMirror.fromTextArea($('#template').get(0),{
         mode:  "jinja2",
-        lineNumbers: true
+        lineNumbers: true,
+        theme: "ambiance"
       });
 
     function getCookie(name) {
