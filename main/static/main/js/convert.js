@@ -46,7 +46,7 @@ $(function(){
     });
 
 
-    /*$('#repoSelect').on('change', function(e) {
+    $('#repoSelect').on('change', function(e) {
         e.preventDefault();
         $('#templateSelect :not(:first-child)').remove();
         $('#varsSelect :not(:first-child)').remove();
@@ -122,7 +122,7 @@ $(function(){
                 alert(xhr.status + ": " + xhr.responseText);
             }
         });
-    });*/
+    });
 
     $('#clear').on('click', function(e) {
         tplEditor.setValue('');

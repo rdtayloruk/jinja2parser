@@ -92,5 +92,7 @@ class Repo():
             return repo.commit(version).hexsha
         else:
             return repo.head.object.hexsha
+            
+
         
     

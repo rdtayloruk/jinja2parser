@@ -2,20 +2,13 @@ from django.shortcuts import render
 from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
+from main.models import Project
 from jinja2 import Environment, meta, exceptions, Undefined, StrictUndefined
-import yaml, json, base64, re
-from main.gitea import GiteaAPI
-
-GITEA_URL = "https://try.gitea.io/api/v1"
-ORG = "rttest"
-TEMPLATE_PATH = "templates"
-VARS_PATH = "vars"
-TEMPLATE_DEF = "j2-templates.json"
-
-vcs =  GiteaAPI(GITEA_URL)
+import yaml, json
 
 def index(request):
-    context = {'repos': get_repos(ORG)}
+    projects = Project.objects.all()
+    context = {'projects': projects}
     return render(request, 'main/index.html', context)
 
 @require_POST
@@ -58,36 +51,3 @@ def convert(request):
 
     return HttpResponse(rendered_jinja2_tpl)
 
-def repo_template_list(request, owner, repo):
-    try:
-        templates = json.loads(get_file(owner, repo, TEMPLATE_DEF))
-        print(templates)
-        return JsonResponse(templates)
-    except:
-        return JsonResponse({"error": "not able to parse %s" % TEMPLATE_DEF})
-
-def repo_file(request, owner, repo, path):
-    path = path + "/" + request.GET.get('name')
-    template = get_file(owner, repo, path)
-    return HttpResponse(template)
-
-
-
-# Helpers
-
-def get_repos(org):
-    repos = vcs.get_repos(org)
-    repos = [r['full_name'] for r in repos]
-    return repos
-
-#def get_templates(org, repo):
-#    templates = vcs.get_contents_path(org, repo, TEMPLATE_PATH)
-#    print(templates)
-#    templates = [t['name'] for t in templates if t['name'].endswith('.j2')]
-#    return templates
-
-def get_file(org, repo, path):
-    file_details = vcs.get_contents_path(org, repo, path)
-    file_base64 = file_details.get('content')
-    file_str = base64.b64decode(file_base64).decode('UTF-8')
-    return file_str

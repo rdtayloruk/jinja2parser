@@ -65,27 +65,24 @@ def update_templates(sender, instance, created, **kwargs):
     try:
         with open(os.path.join(repo.working_dir, template_def)) as f:
             tmpl_json = json.load(f)
-            templates_dir = tmpl_json.get('templates_dir', '')
-            vars_dir = tmpl_json.get('vars_dir', '')
+            templates_dir = tmpl_json.get('templates_dir', '').strip("/")
+            vars_dir = tmpl_json.get('vars_dir', '').strip("/")
             templates = tmpl_json.get('templates')
-            """
             for tmpl in templates:
-                print("repo working dir %s" % repo.working_dir)
                 tmpl_obj = Template.objects.create(
                     name = tmpl.get('name'),
                     description = tmpl.get('description', ''),
-                    template = File(open(os.path.join(repo.working_dir, templates_dir, tmpl.get('name')), 'rb')),
                     version = version
                     )
+                tmpl_obj.template = os.path.join(instance.version_rel_path, templates_dir, tmpl.get('name'))
+                tmpl_obj.save()
                 var_files = tmpl.get('var_files')
                 for var_file in var_files:
-                    VarFile.objects.create(
+                    varfile_obj = VarFile.objects.create(
                         name = var_file,
-                        varfile = File(open(os.path.join(repo.working_dir, vars_dir, var_file), 'rb')),
                         template = tmpl_obj
-                        )"""
+                        )
+                    varfile_obj.varfile = os.path.join(instance.version_rel_path, vars_dir, var_file)
+                    varfile_obj.save()
     except Exception as e:
         log.exception("Failed to load template def: %s", template_def)
-
- 
-        

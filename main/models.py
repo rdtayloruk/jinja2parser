@@ -16,9 +16,13 @@ class Project(models.Model):
     webhook_key = models.CharField(verbose_name="Webhook Key", max_length=200)
     
     @property
-    def project_path(self):
-        return os.path.join(settings.MEDIA_ROOT, 'projects', 
+    def project_rel_path(self):
+        return os.path.join('projects', 
                             self.slug.replace('_', '-'))
+    
+    @property
+    def project_path(self):
+        return os.path.join(settings.MEDIA_ROOT, self.project_rel_path)
     
     @property
     def working_dir(self):
@@ -36,7 +40,7 @@ class Project(models.Model):
         
     
 class Version(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(verbose_name="Slug", unique=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE,
                                 related_name = 'versions')
@@ -44,9 +48,13 @@ class Version(models.Model):
     committed_date = models.DateTimeField()
     
     @property
-    def version_path(self):
-        return os.path.join(self.project.project_path, 'versions',
+    def version_rel_path(self):
+        return os.path.join(self.project.project_rel_path, 'versions',
                             self.slug.replace('_', '-'))
+    
+    @property
+    def version_path(self):
+        return os.path.join(settings.MEDIA_ROOT, self.version_rel_path)
     
     def __str__(self):
         return self.name
@@ -56,27 +64,21 @@ class Version(models.Model):
         self.slug = slugify(clean_name)
         super().save(*args, **kwargs)
 
-
-def template_path(instance, filename):
-        return os.path.join(instance.version.version_path, 'templates', filename)
-
 class Template(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200, blank=True)
-    template = models.FileField(upload_to=template_path)
+    template = models.FileField()
     version = models.ForeignKey(Version, on_delete=models.CASCADE, 
                                 related_name = 'templates')
     
     def __str__(self):
         return self.name
         
-def varfile_path(instance, filename):
-    return os.path.join(instance.template.version.version_path, 'varfiles', filename)
     
 class VarFile(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200, blank=True)
-    varfile = models.FileField(upload_to=varfile_path)
+    varfile = models.FileField()
     template = models.ForeignKey(Template, on_delete=models.CASCADE,
                                  related_name = 'varfiles')
                                  
