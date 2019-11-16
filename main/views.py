@@ -55,8 +55,8 @@ def convert(request):
 def project_versions(request, project_name):
     project = Project.objects.get(name=project_name)
     versions = project.versions.all()
-    context = {'versions': versions}
-    return render(request, 'main/index.html', context)
+    context = {'versions': versions }
+    return render(request, 'main/version_dropdown_list.html', context)
     
 def version_templates(request, project_name, version_name):
     pass

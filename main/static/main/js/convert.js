@@ -66,27 +66,22 @@ $(function(){
 
     $('#projectSelect').on('change', function(e) {
         e.preventDefault();
+        $('#versionSelect :not(:first-child)').remove();
         $('#templateSelect :not(:first-child)').remove();
         $('#varFileSelect :not(:first-child)').remove();
-        console.log("get templates")
-        projectName = $(this).val()
+        console.log("get templates");
+        var project_path = $(this).val();
         $.ajax({
-            url: '/project/' + projectName + '/versions',
+            url: '/' + project_path + '/versions',
             type: 'GET', 
             success: function (data) {
-                console.log(data)
-                projectData = data
-                $.each( projectData.templates, function( i, val ) {
-                    $('#templateSelect').append($('<option>', {
-                        value: val.name,
-                        text: val.name
-                    }));
-                });
+                console.log(data);
+                $("#versionSelect").html(data);
             },
             error: function (xhr,errmsg,err) {
                 alert(xhr.status + ": " + xhr.responseText);
             }
-          });
+         });
     });
     
     $('#templateSelect').on('change', function(e) {

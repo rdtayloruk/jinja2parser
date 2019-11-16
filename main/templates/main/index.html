@@ -34,14 +34,13 @@
                 <select class="custom-select-sm form-control" id="projectSelect" required>
                     <option>Project...</option>
                     {% for project in projects %}
-                    <option>{{project.name}}</option>
+                    <option value="{{project.project_rel_path}}">{{project.name}}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="input-group input-group-sm col-md-1 mb-2">
-                <select class="custom-select-sm form-control" id="projectVersionSelect" required>
-                    <option><a href="#">master</a></option>
-                    <option><a href="#">dev1</a></option>
+                <select class="custom-select-sm form-control" id="versionSelect" required>
+                    <option>-------</option>
                 </select>
             </div>
         </div>
