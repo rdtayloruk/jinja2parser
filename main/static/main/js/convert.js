@@ -1,6 +1,6 @@
 $(function(){
 
-    var repoName;
+    var projectName;
     var templateData;
     var templateName;
     var templateVarsName;
@@ -9,13 +9,29 @@ $(function(){
     var varEditor = CodeMirror.fromTextArea($('#templateVars').get(0),{
         mode:  "yaml",
         lineNumbers: true,
-        theme: "ambiance"
-      });
+        theme: "ambiance",
+        extraKeys: {
+            "F11": function(cm) {
+                cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+            },
+            "Esc": function(cm) {
+                if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+            }
+        }
+     });
     
     var tplEditor = CodeMirror.fromTextArea($('#template').get(0),{
         mode:  "jinja2",
         lineNumbers: true,
-        theme: "ambiance"
+        theme: "ambiance",
+        extraKeys: {
+            "F11": function(cm) {
+                cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+            },
+            "Esc": function(cm) {
+                if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+            }
+        }
       });
 
     function getCookie(name) {
@@ -48,19 +64,19 @@ $(function(){
     });
 
 
-    $('#repoSelect').on('change', function(e) {
+    $('#projectSelect').on('change', function(e) {
         e.preventDefault();
         $('#templateSelect :not(:first-child)').remove();
-        $('#varsSelect :not(:first-child)').remove();
+        $('#varFileSelect :not(:first-child)').remove();
         console.log("get templates")
-        repoName = $(this).val()
+        projectName = $(this).val()
         $.ajax({
-            url: '/repos/' + repoName + '/templates',
+            url: '/project/' + projectName + '/versions',
             type: 'GET', 
             success: function (data) {
                 console.log(data)
-                repoData = data
-                $.each( repoData.templates, function( i, val ) {
+                projectData = data
+                $.each( projectData.templates, function( i, val ) {
                     $('#templateSelect').append($('<option>', {
                         value: val.name,
                         text: val.name
@@ -76,10 +92,10 @@ $(function(){
     $('#templateSelect').on('change', function(e) {
         templateName = $(this).val()
         e.preventDefault();
-        $('#varsSelect :not(:first-child)').remove();
+        $('#varFileSelect :not(:first-child)').remove();
         console.log("get template");
         $.ajax({
-            url: '/repos/' + repoName + '/contents' + repoData.templates_dir,
+            url: '/projects/' + projectName + '/contents' + projectData.templates_dir,
             type: 'GET', 
             data: { 
                 name: templateName,
@@ -92,26 +108,26 @@ $(function(){
                 alert(xhr.status + ": " + xhr.responseText);
             }
           });
-        console.log(repoName, templateName);
-        templateVarFiles = repoData.templates.find(function(tpl){
+        console.log(projectName, templateName);
+        templateVarFiles = projectData.templates.find(function(tpl){
             return tpl.name === templateName
         }).var_files;
         console.log(templateVarFiles)
         $.each(templateVarFiles , function( i, val ) {
-            $('#varsSelect').append($('<option>', {
+            $('#varFileSelect').append($('<option>', {
                 value: val,
                 text: val
             }));
         });
     });
 
-    $('#varsSelect').on('change', function(e) {
+    $('#varFileSelect').on('change', function(e) {
         templateVarsName = $(this).val()
         e.preventDefault();
-        $('#varsSelect :not(:first-child)').remove();
+        $('#varFileSelect :not(:first-child)').remove();
         console.log("get template");
         $.ajax({
-            url: '/repos/' + repoName + '/contents' + repoData.vars_dir,
+            url: '/projects/' + projectName + '/contents' + projectData.vars_dir,
             type: 'GET', 
             data: { 
                 name: templateVarsName,
@@ -129,10 +145,10 @@ $(function(){
     $('#clear').on('click', function(e) {
         tplEditor.setValue('');
         varEditor.setValue('')
-       /* $('#repoSelect :not(:first-child)').remove();
-        $('#repoBranchSelect :not(:first-child)').remove();
+       /* $('#projectSelect :not(:first-child)').remove();
+        $('#projectVersionSelect :not(:first-child)').remove();
         $('#templateSelect :not(:first-child)').remove();
-        $('#varsSelect :not(:first-child)').remove();*/
+        $('#varFileSelect :not(:first-child)').remove();*/
     });
 
     $('#copy').on('click', function(e) {

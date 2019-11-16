@@ -50,4 +50,17 @@ def convert(request):
         return HttpResponse("Error in vars: {0}".format(e), status=400)
 
     return HttpResponse(rendered_jinja2_tpl)
+    
+    
+def project_versions(request, project_name):
+    project = Project.objects.get(name=project_name)
+    versions = project.versions.all()
+    context = {'versions': versions}
+    return render(request, 'main/index.html', context)
+    
+def version_templates(request, project_name, version_name):
+    pass
 
+def template_varfiles(request, project_name, version_name, template_name):
+    pass
+    
