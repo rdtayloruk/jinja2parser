@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.conf import settings
+from django.urls import reverse
 from main.build import Repo
 
 
@@ -69,13 +70,24 @@ class Version(models.Model):
 
 class Template(models.Model):
     name = models.CharField(max_length=200)
+    slug = models.SlugField(verbose_name="Slug")
     description = models.CharField(max_length=200, blank=True)
     template = models.FileField()
     version = models.ForeignKey(Version, on_delete=models.CASCADE, 
                                 related_name = 'templates')
     
+    @property
+    def template_rel_path(self):
+        return os.path.join(self.version.version_rel_path, 'templates',
+                            self.slug)
+    
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        clean_name =  re.sub('\W+','-',self.name)
+        self.slug = slugify(clean_name)
+        super().save(*args, **kwargs)
         
     
 class VarFile(models.Model):

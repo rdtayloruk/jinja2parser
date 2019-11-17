@@ -65,13 +65,13 @@ $(function(){
 
 
     $('#projectSelect').on('change', function(e) {
+        var projectId = $('option:selected', this).attr('data-id');
         e.preventDefault();
         $('#versionSelect :not(:first-child)').remove();
         $('#templateSelect :not(:first-child)').remove();
         $('#varFileSelect :not(:first-child)').remove();
-        var project_path = $(this).val();
         $.ajax({
-            url: '/' + project_path + '/versions',
+            url: '/projects/' + projectId + '/versions',
             type: 'GET', 
             success: function (data) {
                 console.log(data);
@@ -84,12 +84,12 @@ $(function(){
     });
     
     $('#versionSelect').on('change', function(e) {
-        var version_path = $(this).val();
+        var versionId = $('option:selected', this).attr('data-id');
         e.preventDefault();
         $('#templateSelect :not(:first-child)').remove();
         $('#varFileSelect :not(:first-child)').remove();
         $.ajax({
-            url: '/' + version_path + '/templates',
+            url: '/versions/' + versionId + '/templates',
             type: 'GET', 
             success: function (data) {
                 console.log(data);
@@ -102,7 +102,8 @@ $(function(){
     });
     
     $('#templateSelect').on('change', function(e) {
-        var templateUrl = $(this).val();
+        var templateId = $('option:selected', this).attr('data-id');
+        var templateUrl = $('option:selected', this).attr('data-file-url');
         e.preventDefault();
         $('#varFileSelect :not(:first-child)').remove();
         $.ajax({
@@ -115,12 +116,11 @@ $(function(){
                 console.log(xhr.status + ": " + xhr.responseText);
             }
         });
-        var varFileUrl = '/'+ $('#versionSelect').val()
         $.ajax({
-            url: $(),
+            url: '/templates/' + templateId + '/varfiles',
             type: 'GET', 
             success: function (data) {
-                tplEditor.setValue(data);
+                $("#varFileSelect").html(data);;
             },
             error: function (xhr,errmsg,err) {
                 console.log(xhr.status + ": " + xhr.responseText);
@@ -129,10 +129,8 @@ $(function(){
     });
 
     $('#varFileSelect').on('change', function(e) {
-        var varFileUrl = $(this).val()
+        var varFileUrl = $('option:selected', this).attr('data-file-url');
         e.preventDefault();
-        $('#varFileSelect :not(:first-child)').remove();
-        console.log("get template");
         $.ajax({
             url: varFileUrl,
             type: 'GET', 

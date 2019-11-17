@@ -52,23 +52,20 @@ def convert(request):
     return HttpResponse(rendered_jinja2_tpl)
     
     
-def project_versions(request, project_slug):
-    project = get_object_or_404(Project, slug=project_slug)
+def project_versions(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
     versions = project.versions.all()
     context = {'versions': versions }
     return render(request, 'main/version_dropdown_list.html', context)
     
-def version_templates(request, project_slug, version_slug):
-    project = get_object_or_404(Project, slug=project_slug)
-    version = get_object_or_404(Version, slug=version_slug, project=project)
+def version_templates(request, version_id):
+    version = get_object_or_404(Version, pk=version_id)
     templates = version.templates.all()
     context = {'templates': templates }
     return render(request, 'main/template_dropdown_list.html', context)
 
-def template_varfiles(request, project_slug, version_slug, template_slug):
-    project = get_object_or_404(Project, slug=project_slug)
-    version = get_object_or_404(Version, slug=version_slug, project=project)
-    template = get_object_or_404(Template, slug=template_slug, version=version)
+def template_varfiles(request, template_id):
+    template = get_object_or_404(Template, pk=template_id)
     varfiles = template.varfiles.all()
     context = {'varfiles': varfiles }
     return render(request, 'main/varfile_dropdown_list.html', context)

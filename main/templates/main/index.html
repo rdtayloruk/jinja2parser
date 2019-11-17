@@ -34,7 +34,7 @@
                 <select class="custom-select-sm form-control" id="projectSelect" required>
                     <option>Project...</option>
                     {% for project in projects %}
-                    <option value="{{project.project_rel_path}}">{{project.name}}</option>
+                    <option data-id="{{project.pk}}">{{project.name}}</option>
                     {% endfor %}
                 </select>
             </div>
