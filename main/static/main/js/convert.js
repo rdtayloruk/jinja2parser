@@ -69,7 +69,6 @@ $(function(){
         $('#versionSelect :not(:first-child)').remove();
         $('#templateSelect :not(:first-child)').remove();
         $('#varFileSelect :not(:first-child)').remove();
-        console.log("get templates");
         var project_path = $(this).val();
         $.ajax({
             url: '/' + project_path + '/versions',
@@ -79,60 +78,69 @@ $(function(){
                 $("#versionSelect").html(data);
             },
             error: function (xhr,errmsg,err) {
-                alert(xhr.status + ": " + xhr.responseText);
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+         });
+    });
+    
+    $('#versionSelect').on('change', function(e) {
+        var version_path = $(this).val();
+        e.preventDefault();
+        $('#templateSelect :not(:first-child)').remove();
+        $('#varFileSelect :not(:first-child)').remove();
+        $.ajax({
+            url: '/' + version_path + '/templates',
+            type: 'GET', 
+            success: function (data) {
+                console.log(data);
+                $("#templateSelect").html(data);
+            },
+            error: function (xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText);
             }
          });
     });
     
     $('#templateSelect').on('change', function(e) {
-        templateName = $(this).val()
+        var templateUrl = $(this).val();
         e.preventDefault();
         $('#varFileSelect :not(:first-child)').remove();
-        console.log("get template");
         $.ajax({
-            url: '/projects/' + projectName + '/contents' + projectData.templates_dir,
+            url: templateUrl,
             type: 'GET', 
-            data: { 
-                name: templateName,
-            },
             success: function (data) {
-                console.log(data)
                 tplEditor.setValue(data);
             },
             error: function (xhr,errmsg,err) {
-                alert(xhr.status + ": " + xhr.responseText);
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+        });
+        var varFileUrl = '/'+ $('#versionSelect').val()
+        $.ajax({
+            url: $(),
+            type: 'GET', 
+            success: function (data) {
+                tplEditor.setValue(data);
+            },
+            error: function (xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText);
             }
           });
-        console.log(projectName, templateName);
-        templateVarFiles = projectData.templates.find(function(tpl){
-            return tpl.name === templateName
-        }).var_files;
-        console.log(templateVarFiles)
-        $.each(templateVarFiles , function( i, val ) {
-            $('#varFileSelect').append($('<option>', {
-                value: val,
-                text: val
-            }));
-        });
     });
 
     $('#varFileSelect').on('change', function(e) {
-        templateVarsName = $(this).val()
+        var varFileUrl = $(this).val()
         e.preventDefault();
         $('#varFileSelect :not(:first-child)').remove();
         console.log("get template");
         $.ajax({
-            url: '/projects/' + projectName + '/contents' + projectData.vars_dir,
+            url: varFileUrl,
             type: 'GET', 
-            data: { 
-                name: templateVarsName,
-            },
             success: function (data) {
-                console.log(data)
                 varEditor.setValue(data);
             },
             error: function (xhr,errmsg,err) {
-                alert(xhr.status + ": " + xhr.responseText);
+                console.log(xhr.status + ": " + xhr.responseText);
             }
         });
     });

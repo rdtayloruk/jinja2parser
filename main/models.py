@@ -40,8 +40,8 @@ class Project(models.Model):
         
     
 class Version(models.Model):
-    name = models.CharField(max_length=200, unique=True)
-    slug = models.SlugField(verbose_name="Slug", unique=True)
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(verbose_name="Slug")
     project = models.ForeignKey(Project, on_delete=models.CASCADE,
                                 related_name = 'versions')
     hexsha = models.CharField(max_length=200)
@@ -63,6 +63,9 @@ class Version(models.Model):
         clean_name =  re.sub('\W+','-',self.name)
         self.slug = slugify(clean_name)
         super().save(*args, **kwargs)
+    
+    class Meta:
+        unique_together = ['slug', 'project']
 
 class Template(models.Model):
     name = models.CharField(max_length=200)

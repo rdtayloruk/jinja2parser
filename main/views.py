@@ -1,8 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
-from main.models import Project
+from main.models import Project, Version, Template, VarFile
 from jinja2 import Environment, meta, exceptions, Undefined, StrictUndefined
 import yaml, json
 
@@ -52,15 +52,24 @@ def convert(request):
     return HttpResponse(rendered_jinja2_tpl)
     
     
-def project_versions(request, project_name):
-    project = Project.objects.get(name=project_name)
+def project_versions(request, project_slug):
+    project = get_object_or_404(Project, slug=project_slug)
     versions = project.versions.all()
     context = {'versions': versions }
     return render(request, 'main/version_dropdown_list.html', context)
     
-def version_templates(request, project_name, version_name):
-    pass
+def version_templates(request, project_slug, version_slug):
+    project = get_object_or_404(Project, slug=project_slug)
+    version = get_object_or_404(Version, slug=version_slug, project=project)
+    templates = version.templates.all()
+    context = {'templates': templates }
+    return render(request, 'main/template_dropdown_list.html', context)
 
-def template_varfiles(request, project_name, version_name, template_name):
-    pass
+def template_varfiles(request, project_slug, version_slug, template_slug):
+    project = get_object_or_404(Project, slug=project_slug)
+    version = get_object_or_404(Version, slug=version_slug, project=project)
+    template = get_object_or_404(Template, slug=template_slug, version=version)
+    varfiles = template.varfiles.all()
+    context = {'varfiles': varfiles }
+    return render(request, 'main/varfile_dropdown_list.html', context)
     
