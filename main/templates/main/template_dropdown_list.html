@@ -1,0 +1,5 @@
+<option value="">Template...</option>
+{% for template in templates %}
+<option data-id="{{template.pk}}" data-file-url="{{template.template.url}}">{{template.name}}</option>
+{% endfor %}
+                 
