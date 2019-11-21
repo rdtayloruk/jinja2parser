@@ -143,13 +143,47 @@ $(function(){
         });
     });
 
-    $('#clear').on('click', function(e) {
-        tplEditor.setValue('');
-        varEditor.setValue('')
+    $('#templateVarsClear').on('click', function(e) {
+        varEditor.setValue('');
        /* $('#projectSelect :not(:first-child)').remove();
         $('#projectVersionSelect :not(:first-child)').remove();
         $('#templateSelect :not(:first-child)').remove();
         $('#varFileSelect :not(:first-child)').remove();*/
+    });
+    
+    $('#templateVarsFullScreen').on('click', function(e) {
+        varEditor.setOption("fullScreen", !varEditor.getOption("fullScreen"));
+    });
+    
+    $('#templateVarsUndo').on('click', function(e) {
+        varEditor.execCommand('undo');
+    });
+    
+    function destroyClickedElement(event) {
+            document.body.removeChild(event.target);
+        };
+    
+    $('#templateVarsSave').on('click', function(e) {
+        // your CodeMirror textarea ID
+        var textToWrite = varEditor.getValue()
+        var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
+        var fileNameToSaveAs = "varfile.txt";
+        
+        var downloadLink = document.createElement("a");
+        downloadLink.download = fileNameToSaveAs;
+        
+        // hidden link title name
+        downloadLink.innerHTML = "LINKTITLE";
+        
+        window.URL = window.URL || window.webkitURL;
+        
+        downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+        
+        downloadLink.onclick = destroyClickedElement;
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        
     });
 
     $('#copy').on('click', function(e) {
