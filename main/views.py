@@ -1,7 +1,12 @@
+import hmac
+from hashlib import sha1
+
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden, HttpResponseServerError
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.encoding import force_bytes
 from main.models import Project, Version, Template, VarFile
 from jinja2 import Environment, meta, exceptions, Undefined, StrictUndefined
 import yaml, json
@@ -69,4 +74,25 @@ def template_varfiles(request, template_id):
     varfiles = template.varfiles.all()
     context = {'varfiles': varfiles }
     return render(request, 'main/varfile_dropdown_list.html', context)
+
+@csrf_exempt
+@require_POST    
+def webhook(request, project_slug):
+    project = get_object_or_404(Project, name=project_slug)
+    
+    header_signature = request.META.get('HTTP_X_HUB_SIGNATURE')
+    if header_signature is None:
+        return HttpResponseForbidden('Permission denied.')
+
+    sha_name, signature = header_signature.split('=')
+    if sha_name != 'sha1':
+        return HttpResponseServerError('Operation not supported.', status=501)
+
+    mac = hmac.new(force_bytes(project.webhook_key), msg=force_bytes(request.body), digestmod=sha1)
+    if not hmac.compare_digest(force_bytes(mac.hexdigest()), force_bytes(signature)):
+        return HttpResponseForbidden('Permission denied.')
+
+    # If request reached this point we are in a good shape
+    print("success!")
+    return HttpResponse('pong')
     

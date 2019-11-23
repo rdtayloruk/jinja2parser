@@ -65,7 +65,7 @@ class Repo():
         return versions
 
     @property
-    def branches(self):
+    def branches(self, default_branch='master'):
         repo = git.Repo(self.working_dir)
         versions = []
         branches = []
@@ -76,6 +76,8 @@ class Repo():
         for branch in branches:
             if branch.name == 'origin/HEAD':
                 continue
+            if branch.name == 'origin/%s' % default_branch:
+                versions.insert(0, branch.name)
             versions.append(branch.name)
         return versions
         

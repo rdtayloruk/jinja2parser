@@ -58,7 +58,7 @@ class Version(models.Model):
         return os.path.join(settings.MEDIA_ROOT, self.version_rel_path)
     
     def __str__(self):
-        return self.name
+        return self.name.replace('origin/', '')
         
     def save(self, *args, **kwargs):
         clean_name =  re.sub('\W+','-',self.name)

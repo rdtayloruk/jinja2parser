@@ -1,10 +1,6 @@
 $(function(){
 
-    var projectName;
-    var templateData;
-    var templateName;
-    var templateVarsName;
-    var templateVarFiles;
+    var cachedTemplate;
 
     var varEditor = CodeMirror.fromTextArea($('#templateVars').get(0),{
         mode:  "yaml",
@@ -67,15 +63,14 @@ $(function(){
     $('#projectSelect').on('change', function(e) {
         var projectId = $('option:selected', this).attr('data-id');
         e.preventDefault();
-        $('#versionSelect :not(:first-child)').remove();
-        $('#templateSelect :not(:first-child)').remove();
-        $('#varFileSelect :not(:first-child)').remove();
+        $('#versionSelect > option').remove();
+        $('#templateSelect > option').remove();
+        $('#varFileSelect > option').remove();
         $.ajax({
             url: '/projects/' + projectId + '/versions',
             type: 'GET', 
             success: function (data) {
-                console.log(data);
-                $("#versionSelect").html(data);
+                $("#versionSelect").html(data).trigger('change');
             },
             error: function (xhr,errmsg,err) {
                 console.log(xhr.status + ": " + xhr.responseText);
@@ -86,14 +81,13 @@ $(function(){
     $('#versionSelect').on('change', function(e) {
         var versionId = $('option:selected', this).attr('data-id');
         e.preventDefault();
-        $('#templateSelect :not(:first-child)').remove();
-        $('#varFileSelect :not(:first-child)').remove();
+        $('#templateSelect > option').remove();
+        $('#varFileSelect > option').remove();
         $.ajax({
             url: '/versions/' + versionId + '/templates',
             type: 'GET', 
             success: function (data) {
-                console.log(data);
-                $("#templateSelect").html(data);
+                $("#templateSelect").html(data).trigger('change');
             },
             error: function (xhr,errmsg,err) {
                 console.log(xhr.status + ": " + xhr.responseText);
@@ -105,7 +99,7 @@ $(function(){
         var templateId = $('option:selected', this).attr('data-id');
         var templateUrl = $('option:selected', this).attr('data-file-url');
         e.preventDefault();
-        $('#varFileSelect :not(:first-child)').remove();
+        $('#varFileSelect > option').remove();
         $.ajax({
             url: templateUrl,
             type: 'GET', 
@@ -120,7 +114,7 @@ $(function(){
             url: '/templates/' + templateId + '/varfiles',
             type: 'GET', 
             success: function (data) {
-                $("#varFileSelect").html(data);;
+                $("#varFileSelect").html(data).trigger('change');
             },
             error: function (xhr,errmsg,err) {
                 console.log(xhr.status + ": " + xhr.responseText);
@@ -204,6 +198,7 @@ $(function(){
     $('#convert').on('click', function(e) { 
         e.preventDefault();
         console.log("convert triggered")
+        cachedTemplate = tplEditor.getValue();
         $.ajax({
             url: '/convert',
             type: 'POST', 
@@ -223,5 +218,10 @@ $(function(){
                 alert(xhr.responseText);
             }
           });
+    });
+    
+    $('#undo').on('click', function(e) {
+        e.preventDefault();
+        tplEditor.setValue(cachedTemplate);
     });
 });
