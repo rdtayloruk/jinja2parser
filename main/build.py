@@ -78,7 +78,8 @@ class Repo():
                 continue
             if branch.name == 'origin/%s' % default_branch:
                 versions.insert(0, branch.name)
-            versions.append(branch.name)
+            else:
+                versions.append(branch.name)
         return versions
         
     def committed_date(self, version=None):

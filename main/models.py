@@ -8,6 +8,11 @@ from main.build import Repo
 
 
 class Project(models.Model):
+    PROVIDER_CHOICES = [
+        ('GITEA', 'Gitea'),
+        ('GITHUB', 'GitHub'),
+    ]
+    
     name = models.CharField(verbose_name="Project Name", max_length=200,
                             unique=True)
     slug = models.SlugField(verbose_name="Slug", unique=True)
@@ -15,6 +20,14 @@ class Project(models.Model):
     template_def = models.CharField(verbose_name="Jinja2 Definition File",
                                     max_length=200)
     webhook_key = models.CharField(verbose_name="Webhook Key", max_length=200)
+    provider = models.CharField(verbose_name="Git VCS Provider",
+                                choices=PROVIDER_CHOICES,
+                                max_length=200)
+    
+    @property
+    def webhook_url(self):
+        if self.slug:
+            return reverse('webhook', kwargs={'project_slug': self.slug})
     
     @property
     def project_rel_path(self):

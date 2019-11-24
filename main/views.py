@@ -80,19 +80,18 @@ def template_varfiles(request, template_id):
 def webhook(request, project_slug):
     project = get_object_or_404(Project, name=project_slug)
     
-    header_signature = request.META.get('HTTP_X_HUB_SIGNATURE')
-    if header_signature is None:
-        return HttpResponseForbidden('Permission denied.')
-
-    sha_name, signature = header_signature.split('=')
-    if sha_name != 'sha1':
-        return HttpResponseServerError('Operation not supported.', status=501)
-
-    mac = hmac.new(force_bytes(project.webhook_key), msg=force_bytes(request.body), digestmod=sha1)
-    if not hmac.compare_digest(force_bytes(mac.hexdigest()), force_bytes(signature)):
-        return HttpResponseForbidden('Permission denied.')
-
-    # If request reached this point we are in a good shape
-    print("success!")
-    return HttpResponse('pong')
+    if project.provider == "GITHUB":
+        header_signature = request.META.get('HTTP_X_HUB_SIGNATURE')
+        if header_signature is None:
+            return HttpResponseForbidden('Permission denied.')
+    
+        sha_name, signature = header_signature.split('=')
+        if sha_name != 'sha1':
+            return HttpResponseServerError('Operation not supported.', status=501)
+    
+        mac = hmac.new(force_bytes(project.webhook_key), msg=force_bytes(request.body), digestmod=sha1)
+        if not hmac.compare_digest(force_bytes(mac.hexdigest()), force_bytes(signature)):
+            return HttpResponseForbidden('Permission denied.')
+    
+        return HttpResponse('success')
     

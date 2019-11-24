@@ -5,8 +5,8 @@ from .models import Project, Version, Template, VarFile
 
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ('name','url')
-    fields = ('name', 'url', 'template_def', 'slug','webhook_key')
-    readonly_fields = ('slug', 'webhook_key')
+    fields = ('name', 'url', 'template_def', 'provider', 'slug','webhook_key', 'webhook_url')
+    readonly_fields = ('slug', 'webhook_key', 'webhook_url')
 
 class VersionAdmin(admin.ModelAdmin):
     list_display = ('name', 'project', 'hexsha', 'committed_date')
