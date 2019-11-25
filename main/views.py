@@ -92,6 +92,6 @@ def webhook(request, project_slug):
         mac = hmac.new(force_bytes(project.webhook_key), msg=force_bytes(request.body), digestmod=sha1)
         if not hmac.compare_digest(force_bytes(mac.hexdigest()), force_bytes(signature)):
             return HttpResponseForbidden('Permission denied.')
-    
+        project.save()    
         return HttpResponse('success')
     

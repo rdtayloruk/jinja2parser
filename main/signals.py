@@ -21,27 +21,26 @@ clone/fetch project repo, create versions
 """
 @receiver(post_save, sender=Project)    
 def update_project(sender, instance, created, **kwargs):
-    if created:
-        repo = Repo(
-            name = instance.name,
-            url =  instance.url,
-            working_dir = instance.working_dir 
-            )
-        repo.update()
-        # get revisions
-        versions = repo.branches + repo.tags
-        # update or create new versions
-        for version in versions:
-            committed_date = datetime.fromtimestamp(repo.committed_date(version), timezone.utc)
-            hexsha = repo.hexsha(version)
-            Version.objects.update_or_create(
-                name = version, 
-                project = instance,
-                defaults = {
-                    'hexsha': hexsha,
-                    'committed_date': committed_date
-                }
-            ) 
+    repo = Repo(
+        name = instance.name,
+        url =  instance.url,
+        working_dir = instance.working_dir 
+        )
+    repo.update()
+    # get revisions
+    versions = repo.branches + repo.tags
+    # update or create new versions
+    for version in versions:
+        committed_date = datetime.fromtimestamp(repo.committed_date(version), timezone.utc)
+        hexsha = repo.hexsha(version)
+        Version.objects.update_or_create(
+            name = version, 
+            project = instance,
+            defaults = {
+                'hexsha': hexsha,
+                'committed_date': committed_date
+            }
+        ) 
 
 """
 parse version template def, create templates
@@ -56,6 +55,8 @@ def update_templates(sender, instance, created, **kwargs):
             working_dir = instance.project.working_dir 
             )
     repo.checkout_version(instance.name)
+    # delete exist version templates from database
+    instance.templates.all().delete()
     # cleanup version directory and copy new files
     if os.path.exists(instance.version_path):
         shutil.rmtree(instance.version_path)
