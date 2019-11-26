@@ -11,7 +11,6 @@ class Repo():
         self.name = name
         self.url = url
         self.working_dir = working_dir
-        log.info("creating repo: %s", self.name)
         if not os.path.isdir(self.working_dir):
             log.info("creating working_dir: %s", self.working_dir)
             os.makedirs(self.working_dir)
@@ -34,14 +33,17 @@ class Repo():
             log.exception("%s. Error calling: %s", self.name, cmd)
     
     def fetch(self):
+        log.info("fetching repo: %s", self.name)
         cmd = ['git', 'fetch', '--tags']
         self.__call(cmd)
     
-    def checkout_version(self, version='master'):
+    def checkout_version(self, version='origin/master'):
+        log.info("checkout version: %s", version)
         cmd = ['git', 'checkout', version ]
         self.__call(cmd)
     
     def clone(self):
+        log.info("cloning repo: %s", self.name)
         cmd = ['git', 'clone', self.url, self.working_dir]
         self.__call(cmd)
     
@@ -92,9 +94,9 @@ class Repo():
     def hexsha(self, version=None):
         repo = git.Repo(self.working_dir)
         if version:
-            return repo.commit(version).hexsha
+            return repo.git.rev_parse('--short', version)
         else:
-            return repo.head.object.hexsha
+            return repo.git.rev_parse('--short', 'origin/HEAD')
             
 
         

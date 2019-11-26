@@ -54,7 +54,7 @@ def update_templates(sender, instance, created, **kwargs):
             url =  instance.project.url,
             working_dir = instance.project.working_dir 
             )
-    repo.checkout_version(instance.name)
+    repo.checkout_version(version=instance.name)
     # delete exist version templates from database
     instance.templates.all().delete()
     # cleanup version directory and copy new files
