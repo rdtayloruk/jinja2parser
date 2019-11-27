@@ -1,11 +1,14 @@
-import os, re
+import os, re, shutil, logging, json
+from datetime import datetime, timezone
 from django.db import models
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.conf import settings
 from django.urls import reverse
+from django.core.files import File
 from main.build import Repo
 
+log = logging.getLogger(__name__)
 
 class Project(models.Model):
     PROVIDER_CHOICES = [
@@ -52,7 +55,7 @@ class Project(models.Model):
             self.webhook_key = get_random_string(length=25)
         super().save(*args, **kwargs)
         
-    
+
 class Version(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(verbose_name="Slug")
@@ -80,6 +83,7 @@ class Version(models.Model):
     
     class Meta:
         unique_together = ['slug', 'project']
+
 
 class Template(models.Model):
     name = models.CharField(max_length=200)
@@ -112,4 +116,68 @@ class VarFile(models.Model):
                                  
     def __str__(self):
         return self.name
+        
+def project_update_build(instance):
+    repo = Repo(
+        name = instance.name,
+        url =  instance.url,
+        working_dir = instance.working_dir 
+        )
+    repo.update()
+    # get revisions
+    versions = repo.branches + repo.tags
+    # update or create new versions
+    for version in versions:
+        committed_date = datetime.fromtimestamp(repo.committed_date(version), timezone.utc)
+        hexsha = repo.hexsha(version)
+        Version.objects.update_or_create(
+            name = version, 
+            project = instance,
+            defaults = {
+                'hexsha': hexsha,
+                'committed_date': committed_date
+            }
+        ) 
+
+def version_update_templates(instance):
+    # checkout version
+    version = instance
+    repo = Repo(
+            name = instance.project.name,
+            url =  instance.project.url,
+            working_dir = instance.project.working_dir 
+            )
+    repo.checkout_version(version=instance.name)
+    # delete exist version templates from database
+    instance.templates.all().delete()
+    # cleanup version directory and copy new files
+    if os.path.exists(instance.version_path):
+        shutil.rmtree(instance.version_path)
+    shutil.copytree(repo.working_dir, instance.version_path)
+    # parse template_def, create templates => need try except here
+    template_def = instance.project.template_def
+    try:
+        with open(os.path.join(repo.working_dir, template_def)) as f:
+            tmpl_json = json.load(f)
+            templates_dir = tmpl_json.get('templates_dir', '').strip("/")
+            vars_dir = tmpl_json.get('vars_dir', '').strip("/")
+            templates = tmpl_json.get('templates')
+            for tmpl in templates:
+                tmpl_obj = Template.objects.create(
+                    name = tmpl.get('name'),
+                    description = tmpl.get('description', ''),
+                    version = version
+                    )
+                tmpl_obj.template = os.path.join(instance.version_rel_path, templates_dir, tmpl.get('name'))
+                tmpl_obj.save()
+                var_files = tmpl.get('var_files')
+                for var_file in var_files:
+                    varfile_obj = VarFile.objects.create(
+                        name = var_file,
+                        template = tmpl_obj
+                        )
+                    varfile_obj.varfile = os.path.join(instance.version_rel_path, vars_dir, var_file)
+                    varfile_obj.save()
+    except Exception as e:
+        log.exception("Failed to load template def: %s", template_def)
         

@@ -130,7 +130,8 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'simple': {
-            'format': '{asctime} {levelname} {name} {message}',
+            'format': '[{asctime}] {levelname} {name} {message}',
+            'datefmt' : '%d/%b/%Y %H:%M:%S',
             'style': '{',
         },
     },

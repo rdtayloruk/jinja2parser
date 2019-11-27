@@ -98,6 +98,3 @@ class Repo():
         else:
             return repo.git.rev_parse('--short', 'origin/HEAD')
             
-
-        
-    
