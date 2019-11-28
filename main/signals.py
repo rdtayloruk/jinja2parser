@@ -3,7 +3,7 @@ from django.core.files import File
 from datetime import datetime, timezone
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from main.models import Project, Version, Template, VarFile, project_update_build, version_update_templates
+from main.models import Project, Version, Template, VarFile, project_update_versions, version_update_templates
 from main.build import Repo
 
 log = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ clone/fetch project repo, create versions
 @receiver(post_save, sender=Project)    
 def project_update_build_signal(sender, instance, created, **kwargs):
     if created:
-        project_update_build(instance)
+        project_update_versions(instance)
 
 """
 parse version template def, create templates

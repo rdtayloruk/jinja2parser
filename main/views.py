@@ -7,7 +7,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseForbidden, HttpR
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.encoding import force_bytes
-from main.models import Project, Version, Template, VarFile
+from main.models import Project, Version, Template, VarFile, project_update_versions
 from jinja2 import Environment, meta, exceptions, Undefined, StrictUndefined
 import yaml, json
 
@@ -91,7 +91,9 @@ def webhook(request, project_slug):
     
         mac = hmac.new(force_bytes(project.webhook_key), msg=force_bytes(request.body), digestmod=sha1)
         if not hmac.compare_digest(force_bytes(mac.hexdigest()), force_bytes(signature)):
-            return HttpResponseForbidden('Permission denied.')
-        project.save()    
+            return HttpResponseForbidden('Permission denied - Invalid Signature.')
+            
+        project_update_versions(project)
+        
         return HttpResponse('success')
     

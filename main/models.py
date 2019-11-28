@@ -116,8 +116,21 @@ class VarFile(models.Model):
                                  
     def __str__(self):
         return self.name
+
+
+"""
+Utility Functions
+"""
+def load_template_def(path, filename, version_name):
+    template_def_path = os.path.join(path, filename)
+    try:
+        with open(template_def_path) as f:
+            return json.load(f)
+    except OSError:
+        log.info("failed to load template def: %s from version %s", filename, version_name)
+
         
-def project_update_build(instance):
+def project_update_versions(instance):
     repo = Repo(
         name = instance.name,
         url =  instance.url,
@@ -156,28 +169,25 @@ def version_update_templates(instance):
     shutil.copytree(repo.working_dir, instance.version_path)
     # parse template_def, create templates => need try except here
     template_def = instance.project.template_def
-    try:
-        with open(os.path.join(repo.working_dir, template_def)) as f:
-            tmpl_json = json.load(f)
-            templates_dir = tmpl_json.get('templates_dir', '').strip("/")
-            vars_dir = tmpl_json.get('vars_dir', '').strip("/")
-            templates = tmpl_json.get('templates')
-            for tmpl in templates:
-                tmpl_obj = Template.objects.create(
-                    name = tmpl.get('name'),
-                    description = tmpl.get('description', ''),
-                    version = version
+    tmpl_json = load_template_def(repo.working_dir, template_def, instance.name)
+    if tmpl_json:
+        templates_dir = tmpl_json.get('templates_dir', '').strip("/")
+        vars_dir = tmpl_json.get('vars_dir', '').strip("/")
+        templates = tmpl_json.get('templates')
+        for tmpl in templates:
+            tmpl_obj = Template.objects.create(
+                name = tmpl.get('name'),
+                description = tmpl.get('description', ''),
+                version = version
+                )
+            tmpl_obj.template = os.path.join(instance.version_rel_path, templates_dir, tmpl.get('name'))
+            tmpl_obj.save()
+            var_files = tmpl.get('var_files')
+            for var_file in var_files:
+                varfile_obj = VarFile.objects.create(
+                    name = var_file,
+                    template = tmpl_obj
                     )
-                tmpl_obj.template = os.path.join(instance.version_rel_path, templates_dir, tmpl.get('name'))
-                tmpl_obj.save()
-                var_files = tmpl.get('var_files')
-                for var_file in var_files:
-                    varfile_obj = VarFile.objects.create(
-                        name = var_file,
-                        template = tmpl_obj
-                        )
-                    varfile_obj.varfile = os.path.join(instance.version_rel_path, vars_dir, var_file)
-                    varfile_obj.save()
-    except Exception as e:
-        log.exception("Failed to load template def: %s", template_def)
+                varfile_obj.varfile = os.path.join(instance.version_rel_path, vars_dir, var_file)
+                varfile_obj.save()
         

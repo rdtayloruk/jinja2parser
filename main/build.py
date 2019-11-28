@@ -28,7 +28,7 @@ class Repo():
         
     def __call(self, cmd):
         try:
-            subprocess.check_call(cmd, cwd=self.working_dir)
+            subprocess.check_call(cmd, cwd=self.working_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except CalledProcessError as e:
             log.exception("%s. Error calling: %s", self.name, cmd)
     
