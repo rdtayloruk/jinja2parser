@@ -136,37 +136,27 @@ $(function(){
             }
         });
     });
-
-    $('#templateVarsClear').on('click', function(e) {
-        varEditor.setValue('');
-       /* $('#projectSelect :not(:first-child)').remove();
-        $('#projectVersionSelect :not(:first-child)').remove();
-        $('#templateSelect :not(:first-child)').remove();
-        $('#varFileSelect :not(:first-child)').remove();*/
-    });
     
-    $('#templateVarsFullScreen').on('click', function(e) {
-        varEditor.setOption("fullScreen", !varEditor.getOption("fullScreen"));
-    });
+    // Toolbars
     
-    $('#templateVarsUndo').on('click', function(e) {
-        varEditor.execCommand('undo');
-    });
+    function copyToClipboard(textToCopy) {
+        var $temp = $("<textarea>");
+        $("body").append($temp);
+        $temp.val(textToCopy).select();
+        document.execCommand("copy");
+        $temp.remove();
+    }
     
     function destroyClickedElement(event) {
-            document.body.removeChild(event.target);
-        };
-    
-    $('#templateVarsSave').on('click', function(e) {
-        // your CodeMirror textarea ID
-        var textToWrite = varEditor.getValue()
+        document.body.removeChild(event.target);
+    };
+        
+    function saveFile(textToWrite) {
         var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'});
-        var fileNameToSaveAs = "varfile.txt";
         
         var downloadLink = document.createElement("a");
-        downloadLink.download = fileNameToSaveAs;
+        downloadLink.download = "myfile.txt";
         
-        // hidden link title name
         downloadLink.innerHTML = "LINKTITLE";
         
         window.URL = window.URL || window.webkitURL;
@@ -177,23 +167,53 @@ $(function(){
         downloadLink.style.display = "none";
         document.body.appendChild(downloadLink);
         downloadLink.click();
-        
+    };
+    
+    $('#templateVarsCopy').on('click', function(e) {
+        var textToCopy = varEditor.getValue();
+        copyToClipboard(textToCopy);
     });
 
-    $('#copy').on('click', function(e) {
-        console.log("copy...")
-        e.preventDefault();
-        tplEditor.save();
-        console.log($('#template').text());
-        $('#template').select();
-	    document.execCommand('copy');
-        // copy to clipboard
+    $('#templateVarsClear').on('click', function(e) {
+        varEditor.setValue('');
+    });
+    
+    $('#templateVarsFullScreen').on('click', function(e) {
+        varEditor.setOption("fullScreen", !varEditor.getOption("fullScreen"));
+    });
+    
+    $('#templateVarsUndo').on('click', function(e) {
+        varEditor.execCommand('undo');
+    });
+    
+    $('#templateVarsSave').on('click', function(e) {
+        var textToWrite = varEditor.getValue()
+        saveFile(textToWrite)
+    });
+    
+    $('#templateCopy').on('click', function(e) {
+        var textToCopy = tplEditor.getValue();
+        copyToClipboard(textToCopy);
     });
 
-    $('#save').on('click', function(e) {
-        e.preventDefault();
-        // save template as file
+    $('#templateClear').on('click', function(e) {
+        tplEditor.setValue('');
     });
+    
+    $('#templateFullScreen').on('click', function(e) {
+        tplEditor.setOption("fullScreen", !tplEditor.getOption("fullScreen"));
+    });
+    
+    $('#templateUndo').on('click', function(e) {
+        tplEditor.execCommand('undo');
+    });
+    
+    $('#templateSave').on('click', function(e) {
+        var textToWrite = tplEditor.getValue()
+        saveFile(textToWrite)
+    });
+    
+
 
     $('#convert').on('click', function(e) { 
         e.preventDefault();

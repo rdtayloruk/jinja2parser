@@ -24,12 +24,10 @@
 </head>
 
 <body>
+    <nav class="navbar mb-2 justify-content-center">
+        <h4>Jinja2 Template Parser</h4>
+    </nav>
     <div class="container-fluid">
-        <div class="row py-3 text-center"> 
-            <div class="col-md-12">
-                <h3>Jinja2 Template Parser</h3>
-            </div>
-        </div>
         <div class="row">
             <div class="input-group input-group-sm col-md-3 mb-2">
                 <select class="custom-select-sm form-control" id="projectSelect" required>
@@ -43,6 +41,9 @@
                 <select class="custom-select-sm form-control" id="versionSelect" required>
                     <option>-------</option>
                 </select>
+            </div>
+            <div class="col-md-1 mb-2">
+                <span id="versionDetails" class="align-middle"></span>
             </div>
         </div>
         
@@ -80,27 +81,28 @@
 
 
         <div class="row mb-3">
-            <div class="form-group col-md-4">
+            <div class="form-group col-md-3">
                 <nav class="navbar p-1">
                     <div class="navbar-text p-0"><h5>Variables</h5></div>
                     <div class="btn-group float-right" role="group">
-                        <button class="btn btn-sm btn-dark" type="button"><i class="fa fa-copy"></i></button>
-                        <button id="templateVarsSave" class="btn btn-sm btn-dark" type="button"><i class="fa fa-save"></i></button>
-                        <button id="templateVarsUndo" class="btn btn-sm btn-dark" type="button"><i class="fa fa-undo"></i></button>
-                        <button id="templateVarsClear" class="btn btn-sm btn-dark" type="button"><i class="fa fa-trash"></i></button>
-                        <button id="templateVarsFullScreen" class="btn btn-sm btn-dark" type="button"><i class="fa fa-expand-arrows-alt"></i></button>
+                        <button id="templateVarsCopy" class="btn btn-sm btn-light" type="button"><i class="fa fa-copy"></i></button>
+                        <button id="templateVarsSave" class="btn btn-sm btn-light" type="button"><i class="fa fa-save"></i></button>
+                        <button id="templateVarsUndo" class="btn btn-sm btn-light" type="button"><i class="fa fa-undo"></i></button>
+                        <button id="templateVarsClear" class="btn btn-sm btn-light" type="button"><i class="fa fa-trash"></i></button>
+                        <button id="templateVarsFullScreen" class="btn btn-sm btn-light" type="button"><i class="fa fa-expand-arrows-alt"></i></button>
                     </div>
                 </nav>
                 <textarea id="templateVars" name="templateVars" class="form-control">{% include 'main/sample_vars.yml' %}</textarea>
             </div>           
-            <div class="form-group col-md-8">
+            <div class="form-group col-md-9">
                 <nav class="navbar p-1">
                     <div class="navbar-text p-0"><h5>Template</h5></div>
                     <div class="btn-group float-right" role="group">
-                        <button class="btn btn-sm btn-dark" type="button"><i class="fa fa-copy"></i></button>
-                        <button class="btn btn-sm btn-dark" type="button"><i class="fa fa-save"></i></button>
-                        <button class="btn btn-sm btn-dark" type="button"><i class="fa fa-undo"></i></button>
-                        <button class="btn btn-sm btn-dark" type="button"><i class="fa fa-expand-arrows-alt"></i></button>
+                        <button id="templateCopy" class="btn btn-sm btn-light" type="button"><i class="fa fa-copy"></i></button>
+                        <button id="templateSave" class="btn btn-sm btn-light" type="button"><i class="fa fa-save"></i></button>
+                        <button id="templateUndo" class="btn btn-sm btn-light" type="button"><i class="fa fa-undo"></i></button>
+                        <button id="templateClear" class="btn btn-sm btn-light" type="button"><i class="fa fa-trash"></i></button>
+                        <button id="templateFullScreen" class="btn btn-sm btn-light" type="button"><i class="fa fa-expand-arrows-alt"></i></button>
                     </div>
                 </nav>
                 <textarea id="template" name="template" class="form-control">{% include 'main/sample_template.j2' %}</textarea>
@@ -108,8 +110,8 @@
         </div>
         <div class="row mt-3">
             <div class="col-md-12">
-                <button type="submit" class="btn btn-secondary" id="convert">Convert</button>
-                <button type="submit" class="btn btn-secondary" id="undo">Undo</button>
+                <button type="submit" class="btn btn-dark" id="convert">Convert</button>
+                <button type="submit" class="btn btn-outline-dark" id="undo">Undo</button>
             </div>
         </div>
     </div>

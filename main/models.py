@@ -65,6 +65,10 @@ class Version(models.Model):
     committed_date = models.DateTimeField()
     
     @property
+    def url(self):
+        return self.project.url + '/commit/' + self.hexsha
+    
+    @property
     def version_rel_path(self):
         return os.path.join(self.project.project_rel_path, 'versions',
                             self.slug.replace('_', '-'))

@@ -69,6 +69,12 @@ def version_templates(request, version_id):
     context = {'templates': templates }
     return render(request, 'main/template_dropdown_list.html', context)
 
+def version_details(request, version_id):
+    version = get_object_or_404(Version, pk=version_id)
+    templates = version.templates.all()
+    context = {'version': version }
+    return render(request, 'main/version_details.html', context)
+
 def template_varfiles(request, template_id):
     template = get_object_or_404(Template, pk=template_id)
     varfiles = template.varfiles.all()
