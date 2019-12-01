@@ -28,9 +28,11 @@ class Repo():
         
     def __call(self, cmd):
         try:
-            subprocess.check_call(cmd, cwd=self.working_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except CalledProcessError as e:
+            subprocess.check_call(cmd, cwd=self.working_dir, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
+        except subprocess.CalledProcessError as e:
             log.exception("%s. Error calling: %s", self.name, cmd)
+        except subprocess.TimeoutExpired as e:
+            log.exception("%s. Timeout calling: %s", self.name, cmd)
     
     def fetch(self):
         log.info("fetching repo: %s", self.name)
