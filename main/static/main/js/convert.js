@@ -64,7 +64,7 @@ $(function(){
         var projectId = $('option:selected', this).attr('data-id');
         e.preventDefault();
         $('#versionSelect > option').remove();
-        $('#templateSelect > option').remove();
+        $('#templateSelect > option').remove().append('<option>Templates...</option>');
         $('#varFileSelect > option').remove();
         $.ajax({
             url: '/projects/' + projectId + '/versions',
@@ -87,6 +87,7 @@ $(function(){
             url: '/versions/' + versionId + '/templates',
             type: 'GET', 
             success: function (data) {
+                console.log('success!!')
                 $("#templateSelect").html(data).trigger('change');
             },
             error: function (xhr,errmsg,err) {

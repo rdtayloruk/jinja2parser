@@ -66,18 +66,21 @@ def project_versions(request, project_id):
 def version_templates(request, version_id):
     version = get_object_or_404(Version, pk=version_id)
     templates = version.templates.all()
+    if not templates:
+        return HttpResponse("No templates for {0} {1}".format(version.project, version), status=404)
     context = {'templates': templates }
     return render(request, 'main/template_dropdown_list.html', context)
 
 def version_details(request, version_id):
     version = get_object_or_404(Version, pk=version_id)
-    templates = version.templates.all()
     context = {'version': version }
     return render(request, 'main/version_details.html', context)
 
 def template_varfiles(request, template_id):
     template = get_object_or_404(Template, pk=template_id)
     varfiles = template.varfiles.all()
+    if not varfiles:
+        return HttpResponse("No varfiles for {0} {1}".format(template.version.project, template.version, template), status=404)
     context = {'varfiles': varfiles }
     return render(request, 'main/varfile_dropdown_list.html', context)
 

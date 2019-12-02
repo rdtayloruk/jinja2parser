@@ -4,6 +4,9 @@ from git.exc import BadName, InvalidGitRepositoryError
 
 log = logging.getLogger(__name__)
 
+class RepoException(Exception):
+    pass
+
 class Repo():
 
     def __init__(self, name, url, working_dir):
