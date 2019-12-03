@@ -31,7 +31,7 @@
         <div class="row">
             <div class="input-group input-group-sm col-md-3 mb-2">
                 <select class="custom-select-sm form-control" id="projectSelect" required>
-                    <option>Project...</option>
+                    <option value="" hidden>Project...</option>
                     {% for project in projects %}
                     <option data-id="{{project.pk}}">{{project.name}}</option>
                     {% endfor %}
@@ -42,7 +42,7 @@
                     <option>-------</option>
                 </select>
             </div>
-            <div class="col-md-1 mb-2">
+            <div class="col-md-3 mb-2">
                 <span id="versionDetails" class="align-middle"></span>
             </div>
         </div>
@@ -50,14 +50,14 @@
         <div class="row">
             <div class="input-group input-group-sm col-md-3 mb-2">
                 <select class="custom-select-sm form-control" id="templateSelect" required>
-                    <option value="">Template...</option>
+                    <option value="" hidden>Template...</option>
                 </select>
             </div>
         </div>
         <div class="row">
             <div class="input-group input-group-sm col-md-3 mb-2">
                 <select class="custom-select-sm form-control" id="varFileSelect" required>
-                    <option value="">Variable File...</option>
+                    <option value="" hidden>Variable File...</option>
                 </select>
             </div>
         </div>    

@@ -64,7 +64,7 @@ $(function(){
         var projectId = $('option:selected', this).attr('data-id');
         e.preventDefault();
         $('#versionSelect > option').remove();
-        $('#templateSelect > option').remove().append('<option>Templates...</option>');
+        $('#templateSelect > option').remove();
         $('#varFileSelect > option').remove();
         $.ajax({
             url: '/projects/' + projectId + '/versions',
@@ -89,6 +89,17 @@ $(function(){
             success: function (data) {
                 console.log('success!!')
                 $("#templateSelect").html(data).trigger('change');
+            },
+            error: function (xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+         });
+         $.ajax({
+            url: '/versions/' + versionId + '/details',
+            type: 'GET', 
+            success: function (data) {
+                console.log('success!!')
+                $("#versionDetails").html(data);
             },
             error: function (xhr,errmsg,err) {
                 console.log(xhr.status + ": " + xhr.responseText);
