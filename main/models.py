@@ -28,6 +28,12 @@ class Project(models.Model):
                                 max_length=200)
     
     @property
+    def base_url(self):
+        hacked_url = self.url.split('://')[1]
+        hacked_url = re.sub('.git$', '', hacked_url)
+        return 'https://%s' % hacked_url
+    
+    @property
     def webhook_url(self):
         if self.slug:
             return reverse('webhook', kwargs={'project_slug': self.slug})
@@ -66,7 +72,10 @@ class Version(models.Model):
     
     @property
     def url(self):
-        return self.project.url + '/commit/' + self.hexsha
+        if self.project.provider == 'GITEA':
+            return self.project.base_url + '/src/commit/' + self.hexsha
+        if self.project.provider == 'GITHUB':
+            return self.project.base_url + '/tree/' + self.hexsha
     
     @property
     def version_rel_path(self):

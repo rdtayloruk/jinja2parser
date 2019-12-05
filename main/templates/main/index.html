@@ -4,6 +4,7 @@
 <html>
 <head>
     <script src="{% static 'main/js/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'main/js/popper.min.js' %}"></script>
     <script src="{% static 'main/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'main/plugins/codemirror/lib/codemirror.js' %}"></script>
     <script src="{% static 'main/plugins/codemirror/mode/javascript/javascript.js' %}"></script>
@@ -42,8 +43,8 @@
                     <option>-------</option>
                 </select>
             </div>
-            <div class="col-md-3 mb-2">
-                <span id="versionDetails" class="align-middle"></span>
+            <div class="col-md-3 mb-2 align-self-center">
+                    <span id="versionDetails" class="align-middle"></span>
             </div>
         </div>
         
@@ -64,17 +65,17 @@
 
         <div class="row mb-4">
             <div class="col-md-12">
-                <div class="form-check form-check-inline">
+                <div class="form-check form-check-inline" data-toggle="tooltip" title="removes the first newline after a block">
                     <input class="form-check-input" type="checkbox" id="trimBlocks" checked>
                     <label class="form-check-label" for="inlineCheckbox1">trim_blocks</label>
                 </div>
-                <div class="form-check form-check-inline">
+                <div class="form-check form-check-inline" data-toggle="tooltip" title="strips leading spaces and tabs from the start of a line to a block">
                     <input class="form-check-input" type="checkbox" id="lstripBlocks" value="lstrip_blocks" checked>
                     <label class="form-check-label" for="inlineCheckbox2">lstrip_blocks</label>
                 </div>
-                <div class="form-check form-check-inline">
+                <div class="form-check form-check-inline" data-toggle="tooltip" title="convert raises an error if there are undefined variables">
                     <input class="form-check-input" type="checkbox" id="strictUndefined" value="StrictUndefined" checked>
-                    <label class="form-check-label" for="inlineCheckbox3">StrictUndefined</label>
+                    <label class="form-check-label" for="inlineCheckbox3" >StrictUndefined</label>
                 </div>
             </div>
         </div>
@@ -85,7 +86,7 @@
                 <nav class="navbar p-1">
                     <div class="navbar-text p-0"><h5>Variables</h5></div>
                     <div class="btn-group float-right" role="group">
-                        <button id="templateVarsCopy" class="btn btn-sm btn-light" type="button"><i class="fa fa-copy"></i></button>
+                        <button id="templateVarsCopy" class="btn btn-sm btn-light" type="button" ><i class="fa fa-copy"></i></button>
                         <button id="templateVarsSave" class="btn btn-sm btn-light" type="button"><i class="fa fa-save"></i></button>
                         <button id="templateVarsUndo" class="btn btn-sm btn-light" type="button"><i class="fa fa-undo"></i></button>
                         <button id="templateVarsClear" class="btn btn-sm btn-light" type="button"><i class="fa fa-trash"></i></button>

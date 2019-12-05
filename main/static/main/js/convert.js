@@ -58,6 +58,9 @@ $(function(){
             }
         }
     });
+    
+    
+    $('[data-toggle="tooltip"]').tooltip()
 
 
     $('#projectSelect').on('change', function(e) {

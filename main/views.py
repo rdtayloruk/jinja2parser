@@ -18,7 +18,6 @@ def index(request):
 
 @require_POST
 def convert(request):
-    print(request.POST.get('trim_blocks'))
     options = {}
     if request.POST.get('lstrip_blocks') == "true":
         options['lstrip_blocks'] = True
