@@ -139,6 +139,8 @@ def load_template_def(path, filename, version_name):
     try:
         with open(template_def_path) as f:
             return json.load(f)
+    except json.JSONDecodeError:
+        log.info("failed to load template def: %s from version %s - Error Decoding JSON File", filename, version_name)
     except OSError:
         log.info("failed to load template def: %s from version %s", filename, version_name)
 

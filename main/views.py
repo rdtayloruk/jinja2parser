@@ -1,5 +1,5 @@
 import hmac
-from hashlib import sha1
+from hashlib import sha1, sha256
 
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
@@ -86,12 +86,12 @@ def template_varfiles(request, template_id):
 @csrf_exempt
 @require_POST    
 def webhook(request, project_slug):
-    project = get_object_or_404(Project, name=project_slug)
+    project = get_object_or_404(Project, slug=project_slug)
     
     if project.provider == "GITHUB":
         header_signature = request.META.get('HTTP_X_HUB_SIGNATURE')
         if header_signature is None:
-            return HttpResponseForbidden('Permission denied.')
+            return HttpResponseForbidden('Permission denied - Signature Missing')
     
         sha_name, signature = header_signature.split('=')
         if sha_name != 'sha1':
@@ -101,6 +101,20 @@ def webhook(request, project_slug):
         if not hmac.compare_digest(force_bytes(mac.hexdigest()), force_bytes(signature)):
             return HttpResponseForbidden('Permission denied - Invalid Signature.')
             
+        project_update_versions(project)
+        
+        return HttpResponse('success')
+    
+    if project.provider == "GITEA":
+        header_signature = request.META.get('HTTP_X_GITEA_SIGNATURE')
+        if header_signature is None:
+            return HttpResponseForbidden('Permission denied - Signature Missing')
+            
+        mac = hmac.new(force_bytes(project.webhook_key), msg=force_bytes(request.POST.get('payload')), digestmod=sha256)
+        
+        if not hmac.compare_digest(force_bytes(mac.hexdigest()), force_bytes(header_signature)):
+            return HttpResponseForbidden('Permission denied - Invalid Signature.')
+        
         project_update_versions(project)
         
         return HttpResponse('success')

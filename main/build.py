@@ -87,6 +87,7 @@ class Repo():
                 versions.insert(0, branch.name)
             else:
                 versions.append(branch.name)
+        #print(versions)
         return versions
         
     def committed_date(self, version=None):
