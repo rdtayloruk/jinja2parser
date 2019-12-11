@@ -96,6 +96,7 @@ class Version(models.Model):
     
     class Meta:
         unique_together = ['slug', 'project']
+        ordering = ['-committed_date']
 
 
 class Template(models.Model):
@@ -168,8 +169,10 @@ def project_update_versions(instance):
         ) 
 
 def version_update_templates(instance):
-    # checkout version
-    version = instance
+    """
+    update a version
+    """
+    log.info("updating version %s:%s", instance.project.slug, instance)
     repo = Repo(
             name = instance.project.name,
             url =  instance.project.url,
@@ -193,7 +196,7 @@ def version_update_templates(instance):
             tmpl_obj = Template.objects.create(
                 name = tmpl.get('name'),
                 description = tmpl.get('description', ''),
-                version = version
+                version = instance
                 )
             tmpl_obj.template = os.path.join(instance.version_rel_path, templates_dir, tmpl.get('name'))
             tmpl_obj.save()
