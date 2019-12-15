@@ -18,5 +18,4 @@ COPY . /app
 ENV VIRTUAL_ENV /venv
 ENV PATH /venv/bin:$PATH
 
-ENTRYPOINT ["python", "manage.py"]
-CMD ["runserver", "0.0.0.0:8080"]
+CMD ["gunicorn", "--bind", ":8080", "--workers", "3", "jinja2parser.wsgi:application"]

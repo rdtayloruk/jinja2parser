@@ -118,6 +118,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 # 
@@ -125,11 +126,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # Logging
+
+LOGLEVEL = os.getenv('DJANGO_LOGLEVEL', 'info').upper()
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'simple': {
+        'console': {
             'format': '[{asctime}] {levelname} {name} {message}',
             'datefmt' : '%d/%b/%Y %H:%M:%S',
             'style': '{',
@@ -138,13 +142,13 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'console'
         },
     },
     'loggers': {
         '': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': LOGLEVEL,
         },
     },
 }
