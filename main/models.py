@@ -164,7 +164,7 @@ def project_update_versions(instance):
     # get revisions
     versions = repo.branches + repo.tags
     # update or create new versions
-    for version in versions:
+    """for version in versions:
         committed_date = datetime.fromtimestamp(repo.committed_date(version), timezone.utc)
         hexsha = repo.hexsha(version)
         Version.objects.update_or_create(
@@ -175,6 +175,32 @@ def project_update_versions(instance):
                 'committed_date': committed_date
             }
         ) 
+    """    
+    cur_versions = instance.versions.all()
+    new_version_names = repo.branches + repo.tags
+    # update or delete current versions
+    for version in cur_versions:
+        if version.name in new_version_names:
+            if version.hexsha != repo.hexsha(version.name):
+                log.info("updating version %s:%s %s->%s", instance.slug, version, version.hexsha, repo.hexsha(version.name))
+                version.hexsha = repo.hexsha(version.name)
+                version.save()
+        else:
+            log.info("deleting version %s:%s", instance.slug, version)
+            version.delete()
+    # create new versions
+    for name in new_version_names:
+        if name not in cur_versions.values_list('name', flat=True):
+            log.info("creating version %s:%s", instance.slug, name)
+            version = Version.objects.create(
+                name = name,
+                project = instance,
+                hexsha = repo.hexsha(name),
+                committed_date = datetime.fromtimestamp(repo.committed_date(name), timezone.utc)
+            )
+            version.save()
+        
+        
 
 def version_update_templates(instance):
     """

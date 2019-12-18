@@ -13,7 +13,8 @@ cleanup project directory after delete
 """
 @receiver(post_delete, sender=Project)
 def clean_project(sender, instance, **kwargs):
-    shutil.rmtree(instance.project_path)
+    if os.path.isdir(instance.project_path):
+        shutil.rmtree(instance.project_path)
 
 """
 clone/fetch project repo, create versions
@@ -29,3 +30,11 @@ parse version template def, create templates
 @receiver(post_save, sender=Version)
 def version_update_templates_signal(sender, instance, created, **kwargs):
     version_update_templates(instance)
+    
+"""
+cleanup version directory after delete
+"""
+@receiver(post_delete, sender=Version)
+def clean_version(sender, instance, **kwargs):
+    if os.path.isdir(instance.version_path):
+        shutil.rmtree(instance.version_path)
