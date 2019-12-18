@@ -1,4 +1,4 @@
-import os, re, shutil, logging, json
+import os, re, shutil, fnmatch, logging, json
 from datetime import datetime, timezone
 from django.db import models
 from django.utils.crypto import get_random_string
@@ -145,6 +145,14 @@ def load_template_def(path, filename, version_name):
     except OSError:
         log.info("failed to load template def: %s from version %s", filename, version_name)
 
+def include_patterns(*patterns):
+    """Factory function that can be used with copytree() ignore parameter"""
+    def _ignore_patterns(path, names):
+        keep = set(name for pattern in patterns for name in fnmatch.filter(names, pattern))
+        ignore = set(name for name in names if name not in keep and not os.path.isdir(os.path.join(path, name)))
+        return ignore
+    return _ignore_patterns
+
         
 def project_update_versions(instance):
     repo = Repo(
@@ -173,10 +181,14 @@ def version_update_templates(instance):
     update a version
     """
     log.info("updating version %s:%s", instance.project.slug, instance)
+    working_dir = instance.project.working_dir
+    version_dir = instance.version_path
+    template_def = instance.project.template_def
+    # checkout version
     repo = Repo(
             name = instance.project.name,
             url =  instance.project.url,
-            working_dir = instance.project.working_dir 
+            working_dir = working_dir 
             )
     repo.checkout_version(version=instance.name)
     # delete exist version templates from database
@@ -184,13 +196,23 @@ def version_update_templates(instance):
     # cleanup version directory and copy new files
     if os.path.exists(instance.version_path):
         shutil.rmtree(instance.version_path)
-    shutil.copytree(repo.working_dir, instance.version_path)
+    #shutil.copytree(repo.working_dir, instance.version_path)
     # parse template_def, create templates => need try except here
-    template_def = instance.project.template_def
     tmpl_json = load_template_def(repo.working_dir, template_def, instance.name)
     if tmpl_json:
+        # copy template files
         templates_dir = tmpl_json.get('templates_dir', '').strip("/")
+        templates_src = os.path.join(working_dir, templates_dir)
+        templates_dst = os.path.join(version_dir, templates_dir)
+        if os.path.isdir(templates_src):
+            shutil.copytree(templates_src, templates_dst, ignore=include_patterns('*.j2','*.jinja2'))
+        # copy var files
         vars_dir = tmpl_json.get('vars_dir', '').strip("/")
+        vars_src = os.path.join(working_dir, vars_dir)
+        vars_dst = os.path.join(version_dir, vars_dir)
+        if os.path.isdir(vars_src):
+            shutil.copytree(vars_src, vars_dst, ignore=include_patterns('*.yml','*.yaml','*.json'))
+        # index templates
         templates = tmpl_json.get('templates')
         for tmpl in templates:
             tmpl_obj = Template.objects.create(

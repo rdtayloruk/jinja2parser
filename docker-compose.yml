@@ -1,0 +1,34 @@
+version: '2'
+
+networks:
+    jinja2parser-net:
+        external: false
+
+services:
+    nginx:
+        image: nginx
+        container_name: nginx
+        restart: always
+        ports:
+        - "443:443"
+        volumes:
+        - /apps/nginx/conf:/etc/nginx/conf.d
+        - /apps/nginx/log:/var/log/nginx
+        networks:
+        - j2p-net
+    web:
+        image: rdtayloruk/jinja2parser:0.1
+        container_name: jinja2parser
+        environment:
+        - DJANGO_SECRET_KEY=tcpip123
+        - DJANGO_DEBUG=True
+        - DJANGO_LOGLEVEL=INFO
+        volumes:
+        - /apps/jinja2parser/static:/apps/static
+        - /apps/jinja2parser/media:/apps/media
+        networks:
+        - j2p-net
+        ports:
+        - "8080:8080"
+        depends_on:
+        - nginx
