@@ -161,13 +161,17 @@ def project_update_versions(instance):
         working_dir = instance.working_dir 
         )
     repo.update()
+    
     # get revisions
     versions = repo.branches + repo.tags
+    
     # update or create new versions
     cur_versions = instance.versions.all()
     new_version_names = repo.branches + repo.tags
+    
     # update or delete current versions
     for version in cur_versions:
+        
         # update exist versions that have changed
         if version.name in new_version_names:
             if version.hexsha != repo.hexsha(version.name):
@@ -176,10 +180,12 @@ def project_update_versions(instance):
                 version.hexsha = repo.hexsha(version.name)
                 version.committed_date = datetime.fromtimestamp(repo.committed_date(version.name), timezone.utc)
                 version.save()
+                
         # delete old versions
         else:
             log.info("deleting version %s:%s", instance.slug, version)
             version.delete()
+            
     # create new versions
     for name in new_version_names:
         if name not in cur_versions.values_list('name', flat=True):
@@ -225,6 +231,7 @@ def version_update_templates(instance):
     working_dir = instance.project.working_dir
     version_dir = instance.version_path
     template_def = instance.project.template_def
+
     # checkout version
     repo = Repo(
             name = instance.project.name,
@@ -232,27 +239,32 @@ def version_update_templates(instance):
             working_dir = working_dir 
             )
     repo.checkout_version(version=instance.name)
+
     # delete exist version templates from database
     instance.templates.all().delete()
+
     # cleanup version directory and copy new files
     if os.path.exists(instance.version_path):
         shutil.rmtree(instance.version_path)
-    #shutil.copytree(repo.working_dir, instance.version_path)
+
     # parse template_def, create templates => need try except here
     tmpl_json = load_template_def(repo.working_dir, template_def, instance.name)
     if tmpl_json:
+        
         # copy template files
         templates_dir = tmpl_json.get('templates_dir', '').strip("/")
         templates_src = os.path.join(working_dir, templates_dir)
         templates_dst = os.path.join(version_dir, 'templates')
         if os.path.isdir(templates_src):
             shutil.copytree(templates_src, templates_dst, ignore=include_patterns('*.j2','*.jinja2'))
+            
         # copy var files
         vars_dir = tmpl_json.get('vars_dir', '').strip("/")
         vars_src = os.path.join(working_dir, vars_dir)
         vars_dst = os.path.join(version_dir, 'vars')
         if os.path.isdir(vars_src):
             shutil.copytree(vars_src, vars_dst, ignore=include_patterns('*.yml','*.yaml','*.json'))
+            
         # index templates
         templates = tmpl_json.get('templates')
         for tmpl in templates:

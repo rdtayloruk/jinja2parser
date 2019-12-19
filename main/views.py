@@ -39,19 +39,19 @@ def convert(request):
     try:
         jinja2_tpl = jinja2_env.from_string(request.POST.get('template'))
     except (exceptions.TemplateSyntaxError, exceptions.TemplateError) as e:
-        return HttpResponse("Syntax error in jinja2 template: {0}".format(e), status=400)
+        return HttpResponse("Template Syntax Error: {0}".format(e), status=400)
 
     # Load vars
     try:
         values = yaml.safe_load(request.POST.get('templateVars'))
     except (ValueError, yaml.YAMLError, TypeError) as e:
-        return HttpResponse("Value Error in YAML: {0}".format(e), status=400)
+        return HttpResponse("YAML Error: {0}".format(e), status=400)
     
      # Render template
     try:
         rendered_jinja2_tpl = jinja2_tpl.render(values)
     except (exceptions.TemplateRuntimeError, ValueError, TypeError) as e:
-        return HttpResponse("Error in vars: {0}".format(e), status=400)
+        return HttpResponse("Template Render Error: {0}".format(e), status=400)
 
     return HttpResponse(rendered_jinja2_tpl)
     
@@ -79,7 +79,7 @@ def template_varfiles(request, template_id):
     template = get_object_or_404(Template, pk=template_id)
     varfiles = template.varfiles.all()
     if not varfiles:
-        return HttpResponse("No varfiles for {0} {1}".format(template.version.project, template.version, template), status=404)
+        return HttpResponse("No varfiles for {0} {1} {2}".format(template.version.project, template.version, template), status=404)
     context = {'varfiles': varfiles }
     return render(request, 'main/varfile_dropdown_list.html', context)
 

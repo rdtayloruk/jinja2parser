@@ -21,11 +21,11 @@ services:
         container_name: jinja2parser
         environment:
         - DJANGO_SECRET_KEY=tcpip123
-        - DJANGO_DEBUG=True
+        - DJANGO_DEBUG=False
         - DJANGO_LOGLEVEL=INFO
         volumes:
-        - /apps/jinja2parser/static:/apps/static
-        - /apps/jinja2parser/media:/apps/media
+        - /apps/jinja2parser/static:/app/static
+        - /apps/jinja2parser/media:/app/media
         networks:
         - j2p-net
         ports:
