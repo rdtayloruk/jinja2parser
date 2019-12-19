@@ -164,27 +164,19 @@ def project_update_versions(instance):
     # get revisions
     versions = repo.branches + repo.tags
     # update or create new versions
-    """for version in versions:
-        committed_date = datetime.fromtimestamp(repo.committed_date(version), timezone.utc)
-        hexsha = repo.hexsha(version)
-        Version.objects.update_or_create(
-            name = version, 
-            project = instance,
-            defaults = {
-                'hexsha': hexsha,
-                'committed_date': committed_date
-            }
-        ) 
-    """    
     cur_versions = instance.versions.all()
     new_version_names = repo.branches + repo.tags
     # update or delete current versions
     for version in cur_versions:
+        # update exist versions that have changed
         if version.name in new_version_names:
             if version.hexsha != repo.hexsha(version.name):
                 log.info("updating version %s:%s %s->%s", instance.slug, version, version.hexsha, repo.hexsha(version.name))
+                version.templates.all().delete()
                 version.hexsha = repo.hexsha(version.name)
+                version.committed_date = datetime.fromtimestamp(repo.committed_date(version.name), timezone.utc)
                 version.save()
+        # delete old versions
         else:
             log.info("deleting version %s:%s", instance.slug, version)
             version.delete()
@@ -200,7 +192,30 @@ def project_update_versions(instance):
             )
             version.save()
         
-        
+def version_create_template(instance, name, description):
+    tmpl_abs_path = os.path.join(instance.version_path, 'templates', name)
+    if os.path.exists(tmpl_abs_path):
+        tmpl_obj = Template.objects.create(
+            name = name,
+            description = description,
+            version = instance
+            )
+        tmpl_obj.template = os.path.join(instance.version_rel_path, 'templates', name)
+        tmpl_obj.save()
+        return tmpl_obj
+    log.info("No template %s found for %s:%s", name, instance.project, instance)
+
+def template_create_varfile(instance, name):
+    varfile_abs_path = os.path.join(instance.version.version_path, 'vars', name)
+    if os.path.exists(varfile_abs_path):
+        varfile_obj = VarFile.objects.create(
+            name = name,
+            template = instance
+        )
+        varfile_obj.varfile = os.path.join(instance.version.version_rel_path, 'vars', name)
+        varfile_obj.save()
+        return varfile_obj
+    log.info("No varfile %s found for %s:%s", name, instance.version.project, instance.version)
 
 def version_update_templates(instance):
     """
@@ -229,31 +244,23 @@ def version_update_templates(instance):
         # copy template files
         templates_dir = tmpl_json.get('templates_dir', '').strip("/")
         templates_src = os.path.join(working_dir, templates_dir)
-        templates_dst = os.path.join(version_dir, templates_dir)
+        templates_dst = os.path.join(version_dir, 'templates')
         if os.path.isdir(templates_src):
             shutil.copytree(templates_src, templates_dst, ignore=include_patterns('*.j2','*.jinja2'))
         # copy var files
         vars_dir = tmpl_json.get('vars_dir', '').strip("/")
         vars_src = os.path.join(working_dir, vars_dir)
-        vars_dst = os.path.join(version_dir, vars_dir)
+        vars_dst = os.path.join(version_dir, 'vars')
         if os.path.isdir(vars_src):
             shutil.copytree(vars_src, vars_dst, ignore=include_patterns('*.yml','*.yaml','*.json'))
         # index templates
         templates = tmpl_json.get('templates')
         for tmpl in templates:
-            tmpl_obj = Template.objects.create(
-                name = tmpl.get('name'),
-                description = tmpl.get('description', ''),
-                version = instance
-                )
-            tmpl_obj.template = os.path.join(instance.version_rel_path, templates_dir, tmpl.get('name'))
-            tmpl_obj.save()
-            var_files = tmpl.get('var_files')
-            for var_file in var_files:
-                varfile_obj = VarFile.objects.create(
-                    name = var_file,
-                    template = tmpl_obj
-                    )
-                varfile_obj.varfile = os.path.join(instance.version_rel_path, vars_dir, var_file)
-                varfile_obj.save()
+            name = tmpl.get('name')
+            description = tmpl.get('description', '')
+            tmpl_obj = version_create_template(instance, name, description)
+            if tmpl_obj:
+                var_files = tmpl.get('var_files')
+                for name in var_files:
+                    template_create_varfile(tmpl_obj, name)
         
