@@ -18,4 +18,4 @@ COPY . /app
 ENV VIRTUAL_ENV /venv
 ENV PATH /venv/bin:$PATH
 
-CMD ["gunicorn", "--bind", ":8080", "--workers", "3", "jinja2parser.wsgi:application"]
+CMD ["gunicorn", "--bind", ":8000", "--workers", "3", "jinja2parser.wsgi:application"]
