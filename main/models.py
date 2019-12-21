@@ -76,6 +76,7 @@ class Version(models.Model):
             return self.project.base_url + '/src/commit/' + self.hexsha
         if self.project.provider == 'GITHUB':
             return self.project.base_url + '/tree/' + self.hexsha
+            
     
     @property
     def version_rel_path(self):
@@ -85,6 +86,10 @@ class Version(models.Model):
     @property
     def version_path(self):
         return os.path.join(settings.MEDIA_ROOT, self.version_rel_path)
+        
+    @property
+    def template_path(self):
+        return os.path.join(self.version_path, settings.TEMPLATE_DIR)
     
     def __str__(self):
         return self.name.replace('origin/', '')
@@ -106,11 +111,6 @@ class Template(models.Model):
     template = models.FileField()
     version = models.ForeignKey(Version, on_delete=models.CASCADE, 
                                 related_name = 'templates')
-    
-    @property
-    def template_rel_path(self):
-        return os.path.join(self.version.version_rel_path, 'templates',
-                            self.slug)
     
     def __str__(self):
         return self.name
@@ -146,7 +146,6 @@ def load_template_def(path, filename, version_name):
         log.info("failed to load template def: %s from version %s", filename, version_name)
 
 def include_patterns(*patterns):
-    """Factory function that can be used with copytree() ignore parameter"""
     def _ignore_patterns(path, names):
         keep = set(name for pattern in patterns for name in fnmatch.filter(names, pattern))
         ignore = set(name for name in names if name not in keep and not os.path.isdir(os.path.join(path, name)))

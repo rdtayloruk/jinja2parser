@@ -154,3 +154,7 @@ LOGGING = {
         },
     },
 }
+
+# CUSTOM SETTINGS
+TEMPLATE_DIR = 'templates'
+VARS_DIR = 'vars'

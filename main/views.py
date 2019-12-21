@@ -7,8 +7,9 @@ from django.http import HttpResponse, JsonResponse, HttpResponseForbidden, HttpR
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.encoding import force_bytes
+from django.conf import settings
 from main.models import Project, Version, Template, VarFile, project_update_versions
-from jinja2 import Environment, meta, exceptions, Undefined, StrictUndefined
+from jinja2 import Environment, meta, exceptions, Undefined, StrictUndefined, FileSystemLoader
 import yaml, json
 
 def index(request):
@@ -18,6 +19,7 @@ def index(request):
 
 @require_POST
 def convert(request):
+    
     options = {}
     if request.POST.get('lstrip_blocks') == "true":
         options['lstrip_blocks'] = True
@@ -31,9 +33,15 @@ def convert(request):
         options['undefined'] = StrictUndefined
     elif request.POST.get('strict_undefined') == "false":
         options['undefined'] = Undefined
+    
+    version_id = request.POST.get('version')
+    version = Version.objects.get(pk=version_id) if version_id else None
         
-
-    jinja2_env = Environment(**options)
+    jinja2_env = None
+    if version and request.POST.get('use_environment') == "true":
+        jinja2_env = Environment(loader = FileSystemLoader(version.template_path), **options)
+    else:
+        jinja2_env = Environment(**options)
 
     # Load the template
     try:

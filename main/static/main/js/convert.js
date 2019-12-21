@@ -234,6 +234,7 @@ $(function(){
         e.preventDefault();
         console.log("convert triggered")
         cachedTemplate = tplEditor.getValue();
+        var versionId = $('#versionSelect option:selected').attr('data-id')
         $.ajax({
             url: '/convert',
             type: 'POST', 
@@ -242,7 +243,9 @@ $(function(){
                 templateVars: varEditor.getValue(),
                 trim_blocks: $('#trimBlocks').prop('checked'),
                 lstrip_blocks: $('#lstripBlocks').prop('checked'),
-                strict_undefined: $('#strictUndefined').prop('checked')
+                strict_undefined: $('#strictUndefined').prop('checked'),
+                use_environment: $('#useEnvironment').prop('checked'),
+                version: versionId
             },
             //dataType: 'json',
             success: function (data) {

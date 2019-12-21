@@ -67,15 +67,19 @@
             <div class="col-md-12">
                 <div class="form-check form-check-inline" data-toggle="tooltip" title="removes the first newline after a block">
                     <input class="form-check-input" type="checkbox" id="trimBlocks" checked>
-                    <label class="form-check-label" for="inlineCheckbox1">trim_blocks</label>
+                    <label class="form-check-label" for="inlineCheckbox1">trim blocks</label>
                 </div>
                 <div class="form-check form-check-inline" data-toggle="tooltip" title="strips leading spaces and tabs from the start of a line to a block">
                     <input class="form-check-input" type="checkbox" id="lstripBlocks" value="lstrip_blocks" checked>
-                    <label class="form-check-label" for="inlineCheckbox2">lstrip_blocks</label>
+                    <label class="form-check-label" for="inlineCheckbox2">lstrip blocks</label>
                 </div>
                 <div class="form-check form-check-inline" data-toggle="tooltip" title="convert raises an error if there are undefined variables">
                     <input class="form-check-input" type="checkbox" id="strictUndefined" value="StrictUndefined" checked>
                     <label class="form-check-label" for="inlineCheckbox3" >StrictUndefined</label>
+                </div>
+                <div class="form-check form-check-inline" data-toggle="tooltip" title="Loads all template files e.g. for template inheritance">
+                    <input class="form-check-input" type="checkbox" id="useEnvironment" value="UseEnvironment" unchecked>
+                    <label class="form-check-label" for="inlineCheckbox3" >Use Environment</label>
                 </div>
             </div>
         </div>
