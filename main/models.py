@@ -28,28 +28,22 @@ class Project(models.Model):
                                 max_length=200)
     
     @property
-    def base_url(self):
-        hacked_url = self.url.split('://')[1]
-        hacked_url = re.sub('.git$', '', hacked_url)
-        return 'https://%s' % hacked_url
-    
-    @property
     def webhook_url(self):
         if self.slug:
             return reverse('webhook', kwargs={'project_slug': self.slug})
     
     @property
-    def project_rel_path(self):
+    def project_url(self):
         return os.path.join('projects', 
                             self.slug.replace('_', '-'))
     
     @property
-    def project_path(self):
-        return os.path.join(settings.MEDIA_ROOT, self.project_rel_path)
+    def path(self):
+        return os.path.join(settings.MEDIA_ROOT, self.project_url)
     
     @property
     def working_dir(self):
-        return os.path.join(self.project_path, 'checkout')
+        return os.path.join(self.path, 'checkout')
         
     
     def __str__(self):
@@ -72,24 +66,20 @@ class Version(models.Model):
     
     @property
     def url(self):
-        if self.project.provider == 'GITEA':
-            return self.project.base_url + '/src/commit/' + self.hexsha
-        if self.project.provider == 'GITHUB':
-            return self.project.base_url + '/tree/' + self.hexsha
-            
-    
-    @property
-    def version_rel_path(self):
-        return os.path.join(self.project.project_rel_path, 'versions',
+        return os.path.join(self.project.project_url, 'versions',
                             self.slug.replace('_', '-'))
     
     @property
-    def version_path(self):
-        return os.path.join(settings.MEDIA_ROOT, self.version_rel_path)
+    def path(self):
+        return os.path.join(settings.MEDIA_ROOT, self.url)
         
     @property
     def template_path(self):
-        return os.path.join(self.version_path, settings.TEMPLATE_DIR)
+        return os.path.join(self.path, settings.TEMPLATE_DIR)
+    
+    @property
+    def varfiles_path(self):
+        return os.path.join(self.path, settings.VARFILES_DIR)
     
     def __str__(self):
         return self.name.replace('origin/', '')
@@ -144,6 +134,7 @@ def load_template_def(path, filename, version_name):
         log.info("failed to load template def: %s from version %s - Error Decoding JSON File", filename, version_name)
     except OSError:
         log.info("failed to load template def: %s from version %s", filename, version_name)
+        
 
 def include_patterns(*patterns):
     def _ignore_patterns(path, names):
@@ -198,26 +189,26 @@ def project_update_versions(instance):
             version.save()
         
 def version_create_template(instance, name, description):
-    tmpl_abs_path = os.path.join(instance.version_path, 'templates', name)
+    tmpl_abs_path = os.path.join(instance.template_path, name)
     if os.path.exists(tmpl_abs_path):
         tmpl_obj = Template.objects.create(
             name = name,
             description = description,
             version = instance
             )
-        tmpl_obj.template = os.path.join(instance.version_rel_path, 'templates', name)
+        tmpl_obj.template = os.path.join(instance.url, settings.TEMPLATE_DIR, name)
         tmpl_obj.save()
         return tmpl_obj
     log.info("No template %s found for %s:%s", name, instance.project, instance)
 
 def template_create_varfile(instance, name):
-    varfile_abs_path = os.path.join(instance.version.version_path, 'vars', name)
+    varfile_abs_path = os.path.join(instance.version.varfiles_path , name)
     if os.path.exists(varfile_abs_path):
         varfile_obj = VarFile.objects.create(
             name = name,
             template = instance
         )
-        varfile_obj.varfile = os.path.join(instance.version.version_rel_path, 'vars', name)
+        varfile_obj.varfile = os.path.join(instance.version.url, settings.VARFILES_DIR, name)
         varfile_obj.save()
         return varfile_obj
     log.info("No varfile %s found for %s:%s", name, instance.version.project, instance.version)
@@ -228,7 +219,7 @@ def version_update_templates(instance):
     """
     log.info("updating version %s:%s", instance.project.slug, instance)
     working_dir = instance.project.working_dir
-    version_dir = instance.version_path
+    version_dir = instance.path
     template_def = instance.project.template_def
 
     # checkout version
@@ -243,24 +234,25 @@ def version_update_templates(instance):
     instance.templates.all().delete()
 
     # cleanup version directory and copy new files
-    if os.path.exists(instance.version_path):
-        shutil.rmtree(instance.version_path)
+    if os.path.exists(version_dir):
+        shutil.rmtree(version_dir)
 
     # parse template_def, create templates => need try except here
     tmpl_json = load_template_def(repo.working_dir, template_def, instance.name)
+    
     if tmpl_json:
         
         # copy template files
         templates_dir = tmpl_json.get('templates_dir', '').strip("/")
         templates_src = os.path.join(working_dir, templates_dir)
-        templates_dst = os.path.join(version_dir, 'templates')
+        templates_dst = instance.template_path
         if os.path.isdir(templates_src):
             shutil.copytree(templates_src, templates_dst, ignore=include_patterns('*.j2','*.jinja2'))
             
         # copy var files
         vars_dir = tmpl_json.get('vars_dir', '').strip("/")
         vars_src = os.path.join(working_dir, vars_dir)
-        vars_dst = os.path.join(version_dir, 'vars')
+        vars_dst = instance.varfiles_path
         if os.path.isdir(vars_src):
             shutil.copytree(vars_src, vars_dst, ignore=include_patterns('*.yml','*.yaml','*.json'))
             

@@ -157,4 +157,4 @@ LOGGING = {
 
 # CUSTOM SETTINGS
 TEMPLATE_DIR = 'templates'
-VARS_DIR = 'vars'
+VARFILES_DIR = 'vars'

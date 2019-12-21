@@ -13,8 +13,8 @@ cleanup project directory after delete
 """
 @receiver(post_delete, sender=Project)
 def clean_project(sender, instance, **kwargs):
-    if os.path.isdir(instance.project_path):
-        shutil.rmtree(instance.project_path)
+    if os.path.isdir(instance.path):
+        shutil.rmtree(instance.path)
 
 """
 clone/fetch project repo, create versions
@@ -36,5 +36,5 @@ cleanup version directory after delete
 """
 @receiver(post_delete, sender=Version)
 def clean_version(sender, instance, **kwargs):
-    if os.path.isdir(instance.version_path):
-        shutil.rmtree(instance.version_path)
+    if os.path.isdir(instance.path):
+        shutil.rmtree(instance.path)

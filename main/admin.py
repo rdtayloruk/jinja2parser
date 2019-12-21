@@ -11,8 +11,8 @@ class ProjectAdmin(admin.ModelAdmin):
 class VersionAdmin(admin.ModelAdmin):
     list_display = ('name', 'project', 'hexsha', 'committed_date')
     list_filter = ('project__name',)
-    fields = ('name', 'project', 'hexsha', 'committed_date', 'slug', 'version_path')
-    readonly_fields = ('name', 'project','hexsha', 'committed_date', 'slug','version_path')
+    fields = ('name', 'project', 'hexsha', 'committed_date', 'slug', 'path')
+    readonly_fields = ('name', 'project','hexsha', 'committed_date', 'slug','path')
 
 class TemplateAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'version', 'project')
