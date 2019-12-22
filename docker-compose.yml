@@ -1,8 +1,11 @@
 version: '2'
 
 volumes:
-    j2p-static:
-    j2p-media:
+    nginx-conf:
+    nginx-log:
+    j2-static:
+    j2-media:
+    
 
 services:
     nginx:
@@ -12,8 +15,10 @@ services:
         ports:
         - "8080:80"
         volumes:
-        - j2p-static:/app/jinja2parser/static
-        - j2p-media:/app/jinja2parser/media
+        - nginx-conf:/etc/nginx/conf.d
+        - nginx-log:/var/log/nginx
+        - j2-static:/app/jinja2parser/static
+        - j2-media:/app/jinja2parser/media
     web:
         image: rdtayloruk/jinja2parser:0.1
         container_name: jinja2parser
@@ -22,8 +27,9 @@ services:
         - DJANGO_DEBUG=False
         - DJANGO_LOGLEVEL=INFO
         volumes:
-        - j2p-static:/app/static
-        - j2p-media:/app/media
+        - j2-static:/app/static
+        - j2-media:/app/media
+        
         expose:
         - "8000"
         depends_on:
