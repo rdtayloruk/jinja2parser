@@ -1,21 +1,19 @@
 version: '2'
 
-networks:
-    jinja2parser-net:
-        external: false
+volumes:
+    j2p-static:
+    j2p-media:
 
 services:
     nginx:
-        image: nginx
+        image: nginx:latest
         container_name: nginx
         restart: always
         ports:
-        - "443:443"
+        - "8080:80"
         volumes:
-        - /apps/nginx/conf:/etc/nginx/conf.d
-        - /apps/nginx/log:/var/log/nginx
-        networks:
-        - j2p-net
+        - j2p-static:/app/jinja2parser/static
+        - j2p-media:/app/jinja2parser/media
     web:
         image: rdtayloruk/jinja2parser:0.1
         container_name: jinja2parser
@@ -24,11 +22,9 @@ services:
         - DJANGO_DEBUG=False
         - DJANGO_LOGLEVEL=INFO
         volumes:
-        - /apps/jinja2parser/static:/app/static
-        - /apps/jinja2parser/media:/app/media
-        networks:
-        - j2p-net
-        ports:
-        - "8080:8080"
+        - j2p-static:/app/static
+        - j2p-media:/app/media
+        expose:
+        - "8000"
         depends_on:
         - nginx
