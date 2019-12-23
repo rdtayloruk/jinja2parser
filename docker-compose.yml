@@ -26,6 +26,7 @@ services:
         - DJANGO_SECRET_KEY=tcpip123
         - DJANGO_DEBUG=False
         - DJANGO_LOGLEVEL=INFO
+        - DJANGO_ALLOWED_HOSTS=.eu-west-1.amazonaws.com,.eu-west-1.compute.amazonaws.com
         volumes:
         - j2-static:/app/static
         - j2-media:/app/media
