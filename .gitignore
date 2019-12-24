@@ -4,3 +4,4 @@ jinja2parser/jinja2parser/__pycache__
 jinja2parser/main/__pycache__
 jinja2parser/main/migrations
 jinja2parser/media
+jinja2parser/static

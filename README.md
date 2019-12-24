@@ -1,14 +1,9 @@
-         ___        ______     ____ _                 _  ___  
-        / \ \      / / ___|   / ___| | ___  _   _  __| |/ _ \ 
-       / _ \ \ /\ / /\___ \  | |   | |/ _ \| | | |/ _` | (_) |
-      / ___ \ V  V /  ___) | | |___| | (_) | |_| | (_| |\__, |
-     /_/   \_\_/\_/  |____/   \____|_|\___/ \__,_|\__,_|  /_/ 
- ----------------------------------------------------------------- 
 
+Jinja2Parser Web Tool
+A web app for parsing Jinja2 templates using variables from a YAML file. Works standalone and/or can synchronise with template and variable files stored on a Git repository (GitHub or Gitea). Repository are added 
 
-Hi there! Welcome to AWS Cloud9!
-
-To get started, create some files, play with the terminal,
-or visit https://docs.aws.amazon.com/console/cloud9/ for our documentation.
-
-Happy coding!
+docker-compose up -d --build
+docker exec jinja2parser python manage.py collectstatic --noinput
+docker exec jinja2parser python manage.py flush --noinput
+docker exec jinja2parser python manage.py migrate --noinput 
+docker exec jinja2parser python manage.py createsuperuser --username admin --email rdtayloruk@outlook.com --noinput
