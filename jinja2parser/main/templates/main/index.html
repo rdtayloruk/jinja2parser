@@ -1,0 +1,125 @@
+{% load static %}
+{% csrf_token %}
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="{% static 'main/js/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'main/js/popper.min.js' %}"></script>
+    <script src="{% static 'main/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'main/plugins/codemirror/lib/codemirror.js' %}"></script>
+    <script src="{% static 'main/plugins/codemirror/mode/javascript/javascript.js' %}"></script>
+    <script src="{% static 'main/plugins/codemirror/mode/yaml/yaml.js' %}"></script>
+    <script src="{% static 'main/plugins/codemirror/mode/jinja2/jinja2.js' %}"></script>
+    <script src="{% static 'main/plugins/codemirror/addon/display/fullscreen.js' %}"></script>
+    <script src="{% static 'main/js/clipboard.min.js' %}"></script>
+    <script src="{% static 'main/js/convert-min.js' %}"></script>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/fa/css/all.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'main/plugins/codemirror/lib/codemirror.css' %} ">
+    <link rel="stylesheet" type="text/css" href="{% static 'main/plugins/codemirror/theme/ambiance.css' %} ">
+    <link rel="stylesheet" type="text/css" href="{% static 'main/plugins/codemirror/addon/display/fullscreen.css' %} ">
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+
+    <title>Jinja2 Template Parser</title>
+</head>
+
+<body>
+    <nav class="navbar mb-2 justify-content-center">
+        <h4>Jinja2 Template Parser</h4>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="input-group input-group-sm col-md-3 mb-2">
+                <select class="custom-select-sm form-control" id="projectSelect" required>
+                    <option value="" hidden>Project...</option>
+                    {% for project in projects %}
+                    <option data-id="{{project.pk}}">{{project.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="input-group input-group-sm col-md-1 mb-2">
+                <select class="custom-select-sm form-control" id="versionSelect" required>
+                    <option>-------</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-2 align-self-center">
+                    <span id="versionDetails" class="align-middle"></span>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="input-group input-group-sm col-md-3 mb-2">
+                <select class="custom-select-sm form-control" id="templateSelect" required>
+                    <option value="" hidden>Template...</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-group input-group-sm col-md-3 mb-2">
+                <select class="custom-select-sm form-control" id="varFileSelect" required>
+                    <option value="" hidden>Variable File...</option>
+                </select>
+            </div>
+        </div>    
+
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="form-check form-check-inline" data-toggle="tooltip" title="removes the first newline after a block">
+                    <input class="form-check-input" type="checkbox" id="trimBlocks" checked>
+                    <label class="form-check-label" for="inlineCheckbox1">trim blocks</label>
+                </div>
+                <div class="form-check form-check-inline" data-toggle="tooltip" title="strips leading spaces and tabs from the start of a line to a block">
+                    <input class="form-check-input" type="checkbox" id="lstripBlocks" value="lstrip_blocks" checked>
+                    <label class="form-check-label" for="inlineCheckbox2">lstrip blocks</label>
+                </div>
+                <div class="form-check form-check-inline" data-toggle="tooltip" title="convert raises an error if there are undefined variables">
+                    <input class="form-check-input" type="checkbox" id="strictUndefined" value="StrictUndefined" checked>
+                    <label class="form-check-label" for="inlineCheckbox3" >StrictUndefined</label>
+                </div>
+                <div class="form-check form-check-inline" data-toggle="tooltip" title="Loads all template files e.g. for template inheritance">
+                    <input class="form-check-input" type="checkbox" id="useEnvironment" value="UseEnvironment" unchecked>
+                    <label class="form-check-label" for="inlineCheckbox3" >Use Environment</label>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <div class="form-group col-md-3">
+                <nav class="navbar p-1">
+                    <div class="navbar-text p-0"><h5>Variables</h5></div>
+                    <div class="btn-group float-right" role="group">
+                        <button id="templateVarsCopy" class="btn btn-sm btn-light" type="button" ><i class="fa fa-copy"></i></button>
+                        <button id="templateVarsSave" class="btn btn-sm btn-light" type="button"><i class="fa fa-save"></i></button>
+                        <button id="templateVarsUndo" class="btn btn-sm btn-light" type="button"><i class="fa fa-undo"></i></button>
+                        <button id="templateVarsClear" class="btn btn-sm btn-light" type="button"><i class="fa fa-trash"></i></button>
+                        <button id="templateVarsFullScreen" class="btn btn-sm btn-light" type="button"><i class="fa fa-expand-arrows-alt"></i></button>
+                    </div>
+                </nav>
+                <textarea id="templateVars" name="templateVars" class="form-control">{% include 'main/sample_vars.yml' %}</textarea>
+            </div>           
+            <div class="form-group col-md-9">
+                <nav class="navbar p-1">
+                    <div class="navbar-text p-0"><h5>Template</h5></div>
+                    <div class="btn-group float-right" role="group">
+                        <button id="templateCopy" class="btn btn-sm btn-light" type="button"><i class="fa fa-copy"></i></button>
+                        <button id="templateSave" class="btn btn-sm btn-light" type="button"><i class="fa fa-save"></i></button>
+                        <button id="templateUndo" class="btn btn-sm btn-light" type="button"><i class="fa fa-undo"></i></button>
+                        <button id="templateClear" class="btn btn-sm btn-light" type="button"><i class="fa fa-trash"></i></button>
+                        <button id="templateFullScreen" class="btn btn-sm btn-light" type="button"><i class="fa fa-expand-arrows-alt"></i></button>
+                    </div>
+                </nav>
+                <textarea id="template" name="template" class="form-control">{% include 'main/sample_template.j2' %}</textarea>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-dark" id="convert">Convert</button>
+                <button type="submit" class="btn btn-outline-dark" id="undo">Undo</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

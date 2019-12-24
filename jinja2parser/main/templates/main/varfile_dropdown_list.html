@@ -1,0 +1,4 @@
+{% for varfile in varfiles %}
+<option data-id="{{varfile.pk}}" data-file-url="{{varfile.varfile.url}}">{{varfile.name}}</option>
+{% endfor %}
+                 

@@ -1,0 +1,17 @@
+{% verbatim %}
+service password-encryption
+hostname {{ global.hostname }}
+enable secret {{ global.enable }}
+username {{ global.username }} privilege 15 secret {{ global.adminpass }}
+ 
+logging trap informational
+{% for server in global.syslog %}
+logging host {{ server }}
+{% endfor %}
+ 
+ntp authentication-key 1 md5 {{ global.ntpkey }}
+ntp trusted-key 1
+{% for server in global.ntpserver %}
+ntp server {{ server }} key 1
+{% endfor %}
+{% endverbatim %}

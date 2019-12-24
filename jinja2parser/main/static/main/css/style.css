@@ -1,0 +1,30 @@
+html, body {
+    background-color: #fbfbfb;
+}
+
+.CodeMirror {
+    border: 1px solid #eee;
+    height: 550px;
+}
+
+#template,
+#render,
+#values {
+    width: 100%;
+    min-height: 300px;
+    resize: vertical;
+    font-family: "Courier New", Courier, monospace;
+    border: 1px solid #ccc;
+}
+
+#render {
+    background: #eee;
+}
+
+span.whitespace {
+    color: #ccc;
+}
+
+label {
+    font-weight: normal;
+}
