@@ -9,6 +9,7 @@ WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 
 RUN apk add git \
+    && git config --global http.sslVerify false \
     && python -m venv /venv \
     && /venv/bin/pip install --upgrade pip \
     && /venv/bin/pip install --no-cache-dir -r requirements.txt
