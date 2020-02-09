@@ -1,0 +1,25 @@
+version: '2'
+
+volumes:
+    j2-src:
+    j2-static:
+    j2-media:
+    
+
+services:
+    web:
+        image: rdtayloruk/jinja2parser:0.1
+        container_name: jinja2parser
+        environment:
+        - DJANGO_SECRET_KEY=tcpip123
+        - DJANGO_SUPERUSER_PASSWORD=tcpip123
+        - DJANGO_DEBUG=False
+        - DJANGO_LOGLEVEL=INFO
+        - DJANGO_ALLOWED_HOSTS=.eu-west-1.amazonaws.com,.eu-west-1.compute.amazonaws.com
+        volumes:
+        - j2-src:/app
+        - j2-static:/app/static
+        - j2-media:/app/media
+        
+        ports:
+        - "8080:8000"
