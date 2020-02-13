@@ -1,4 +1,4 @@
-import hmac
+import hmac, logging, yaml, json
 from hashlib import sha1, sha256
 
 from django.shortcuts import get_object_or_404, render
@@ -10,12 +10,15 @@ from django.utils.encoding import force_bytes
 from django.conf import settings
 from main.models import Project, Version, Template, VarFile, project_update_versions
 from jinja2 import Environment, meta, exceptions, Undefined, StrictUndefined, FileSystemLoader
-import yaml, json
+
+log = logging.getLogger(__name__)
 
 def index(request):
     projects = Project.objects.all()
     context = {'projects': projects}
     return render(request, 'main/index.html', context)
+
+
 
 @require_POST
 def convert(request):
@@ -118,7 +121,13 @@ def webhook(request, project_slug):
         if header_signature is None:
             return HttpResponseForbidden('Permission denied - Signature Missing')
             
-        mac = hmac.new(force_bytes(project.webhook_key), msg=force_bytes(request.POST.get('payload')), digestmod=sha256)
+        payload = None
+        if request.content_type == "application/json":
+            payload = request.body
+        else:
+            payload = request.POST.get('payload')
+            
+        mac = hmac.new(force_bytes(project.webhook_key), msg=force_bytes(payload), digestmod=sha256)
         
         if not hmac.compare_digest(force_bytes(mac.hexdigest()), force_bytes(header_signature)):
             return HttpResponseForbidden('Permission denied - Invalid Signature.')
