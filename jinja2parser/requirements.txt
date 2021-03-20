@@ -6,7 +6,7 @@ gitdb2==2.0.6
 GitPython==3.0.3
 gunicorn==20.0.4
 idna==2.8
-Jinja2==2.10.1
+Jinja2==2.11.3
 MarkupSafe==1.1.1
 pytz==2019.3
 PyYAML==5.1.2
