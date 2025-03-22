@@ -25,8 +25,9 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', False)
 
-#ALLOWED_HOSTS = ['.eu-west-1.amazonaws.com', '.eu-west-1.compute.amazonaws.com']
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
+
+CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', 'https://localhost').split(',')
 
 # Application definition
 
@@ -157,3 +158,5 @@ LOGGING = {
 # CUSTOM SETTINGS
 TEMPLATE_DIR = 'templates'
 VARFILES_DIR = 'vars'
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'

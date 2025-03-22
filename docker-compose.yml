@@ -26,9 +26,10 @@ services:
         environment:
         - DJANGO_SECRET_KEY=tcpip123
         - DJANGO_SUPERUSER_PASSWORD=tcpip123
-        - DJANGO_DEBUG=False
-        - DJANGO_LOGLEVEL=INFO
-        - DJANGO_ALLOWED_HOSTS=.eu-west-1.amazonaws.com,.eu-west-1.compute.amazonaws.com
+        - DJANGO_DEBUG=True
+        - DJANGO_LOGLEVEL=DEBUG
+        - DJANGO_ALLOWED_HOSTS=localhost
+        - DJANGO_CSRF_TRUSTED_ORIGINS=http://localhost:8080
         volumes:
         - j2-src:/app
         - j2-static:/app/static

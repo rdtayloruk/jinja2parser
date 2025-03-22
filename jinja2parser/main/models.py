@@ -85,7 +85,7 @@ class Version(models.Model):
         return self.name.replace('origin/', '')
         
     def save(self, *args, **kwargs):
-        clean_name =  re.sub('\W+','-',self.name)
+        clean_name =  re.sub(r'\W+','-',self.name)
         self.slug = slugify(clean_name)
         super().save(*args, **kwargs)
     
@@ -106,7 +106,7 @@ class Template(models.Model):
         return self.name
     
     def save(self, *args, **kwargs):
-        clean_name =  re.sub('\W+','-',self.name)
+        clean_name =  re.sub(r'\W+','-',self.name)
         self.slug = slugify(clean_name)
         super().save(*args, **kwargs)
         

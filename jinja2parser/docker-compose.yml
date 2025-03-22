@@ -15,7 +15,7 @@ services:
         - DJANGO_SUPERUSER_PASSWORD=tcpip123
         - DJANGO_DEBUG=False
         - DJANGO_LOGLEVEL=INFO
-        - DJANGO_ALLOWED_HOSTS=.eu-west-1.amazonaws.com,.eu-west-1.compute.amazonaws.com
+        - DJANGO_ALLOWED_HOSTS=localhost
         volumes:
         - j2-src:/app
         - j2-static:/app/static
